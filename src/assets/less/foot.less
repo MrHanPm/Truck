@@ -1,0 +1,96 @@
+/*
+	* @description	: 二手车
+	* @authors 		: 于风磊
+	* @date 		: 2016-10-26
+*/
+
+/* Reset */
+html,body,form,p,h1,h2,h3,h4,dl,ul,ol,li,dt,dd,select,figure,figcaption{margin:0;padding:0;font-size:16px;font-weight:400;}
+body,select,input,option,button,textarea{color:#333;font:12px/1.5 "Microsoft YaHei",Arial;-webkit-text-size-adjust:none;}
+ul,ol,li{list-style-type:none;}
+em,i,var{font-style:normal;}
+a{text-decoration:none;color:#333;-webkit-tap-highlight-color:transparent;-webkit-tap-highlight-color:rgba(255,0,0,0);}
+a img{border:0 none;}
+img{width:100%;vertical-align:top;}
+body{background:#f5f5f5;}
+
+@font-face {
+  font-family: 'second';
+  src:url('//at.alicdn.com/t/font_491cauy45qfo5hfr.woff') format('woff'),
+  url('//at.alicdn.com/t/font_491cauy45qfo5hfr.ttf') format('truetype')
+}
+
+/*主页吸底*/
+.home-foot,.detail-foot,.footer{position:relative;height:50px;line-height:50px;background: #FAFBFC;box-shadow: 0px -1px 2px 0px rgba(0,0,0,0.05);padding:0 52px;display: -webkit-box;display: -ms-flexbox;display:flex;}
+.home-foot span{position:absolute;top:7px;width:36px;height:36px;border-radius:50%;border:1px solid #e5e5e5;}
+.home-foot .return{left:15px;}
+.home-foot .return:before{position:absolute;top:-6px;left:10px;font-family: 'second';content:"\5de6";font-size:12px;color:#999;}
+.home-foot .menu{right:15px;}
+.home-foot .menu:before{position:absolute;top:-6px;left:11px;font-family: 'second';content:"\5355";color:#999;font-size:15px;}
+.home-foot a{width:33.3%;font-size:14px;text-align:center;color:#666;-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
+.home-foot .selected{font-size:18px;color:#f85200;border-bottom:2px solid #f85200;border-radius:1px;}
+
+/*拍卖底部*/
+.auction{display: -webkit-box;display: -ms-flexbox;display:flex;}
+.auction span{line-height:16px;font-size:12px;color:#999;margin-top:17px;-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
+.auction span var{font-size:16px;color:#f85200;}
+.auction .pay{display:inline-block;width:230px;height:36px;line-height:36px;text-align:center;font-size:14px;margin-top:7px;color:#fff;background:#f85200;border:1px solid #d64700;border-radius:18px;-webkit-box-flex:2;-moz-box-flex:2;-ms-flex:2;flex:2;}
+
+/*服务协议底部*/
+.agree-btn,.sure-btn{display: -webkit-box;display: -ms-flexbox;display:flex;}
+.agree-btn .agree,.sure-btn .sure{-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
+.agree-btn .disagree,.sure-btn .sure-btn{-webkit-box-flex:2;-moz-box-flex:2;-ms-flex:2;flex:2;}
+.agree-btn,.auction,.sure-btn{height:50px;background: #FAFBFC;box-shadow: 0px -1px 2px 0px rgba(0,0,0,0.05);margin-top:10px;padding:0 15px;}
+.agree-btn span,.sure-btn span{display:inline-block;font-size:14px;text-align:center;line-height:36px;margin-top:7px;}
+.agree-btn .agree,.sure-btn .sure{width:100px;height:36px;border:1px solid #e5e5e5;border-radius:18px;background:#fff;color:#333;margin-right:15px;}
+.agree-btn .disagree,.sure-btn .cancel{width:230px;height:36px;border:1px solid #d64700;border-radius:18px;background:#f85200;color:#fff;}
+.sure-btn .cancel{-webkit-box-flex:2;-moz-box-flex: 2;-ms-flex:2;flex: 2;}
+
+/*活动结束*/
+.detail-foot .sign-end{width:243px;height:36px;margin:7px auto 0;background:#999;border-radius:18px;text-align:center;}
+.detail-foot .sign-end h4{line-height:36px;font-size:16px;color:#fff;font-weight:bold;text-align:center;}
+
+/*详情页吸底*/
+.detail-foot,.comment,.auction-list{position:relative;padding:0 66px;margin-top:10px;}
+.detail-foot .sign-up{width:243px;height:36px;margin:7px auto 0;background:#f85200;border-radius:18px;text-align:center;}
+.detail-foot .sign-up h4{line-height:16px;font-size:16px;color:#fff;font-weight:bold;margin:4px 0 2px 0;}
+.detail-foot .sign-up em{display:block;line-height:10px;font-size:10px;color:#fff;}
+.detail-foot .return,.menu,.comment .return,.menu,.footer .return{position:absolute;top:7px;width:36px;height:36px;border-radius:50%;border:1px solid #e5e5e5;display: -webkit-box;display: -ms-flexbox;display:flex;}
+.detail-foot .return,.comment .return{left:15px;}
+.detail-foot .return:before,.footer .return:before{position:absolute;top:-6px;left:10px;font-family: 'second';content:"\5de6";font-size:12px;color:#999;}
+.detail-foot .menu,.comment .menu,.footer .menu{right:15px;}
+.detail-foot .menu:before{position:absolute;top:-6px;left:11px;font-family: 'second';content:"\5355";color:#999;font-size:15px;}
+.comment .return:before{position:absolute;top:10px;left:10px;font-family: 'second';content:"\5de6";font-size:12px;color:#999;}
+.comment .menu:before{position:absolute;top:8px;left:11px;font-family: 'second';content:"\5355";color:#999;font-size:15px;}
+/*评论底部*/
+.comment{height:43px;background: #FAFBFC;box-shadow: 0px -1px 2px 0px rgba(0,0,0,0.05);padding-top:7px;display: -webkit-box;display: -ms-flexbox;display:flex;}
+.comment .comment-on,.auction-list .connection{display:block;width:253px;height:36px;line-height:36px;text-align:center;font-size:14px;color:#fff;background:#f85200;border:1px solid #d64700;border-radius:18px;}
+.comment .comment-on{-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
+/*拍卖列表底部*/
+.auction-list{height:43px;background: #FAFBFC;box-shadow: 0px -1px 2px 0px rgba(0,0,0,0.05);padding-top:7px;display: -webkit-box;display: -ms-flexbox;display:flex;}
+.auction-list span{position:absolute;top:7px;width:36px;height:36px;border:1px solid #e5e5e5;border-radius:50%;-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
+.auction-list .home-page{left:15px;}
+.auction-list .close{right:15px;}
+.auction-list .connection{background:#fff;color:#333;border:1px solid #e5e5e5;-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
+.auction-list .home-page:before{position:absolute;top:6px;left:9px;font-family: 'second';content:"\9996";font-size:16px;color:#979797;}
+.auction-list .close:before{position:absolute;top:10px;left:12px;font-family: 'second';content:"\5173";font-size:13px;color:#999;}
+
+/*拍卖已报名吸底*/
+.footer{padding:0 0 0 66px;margin-top:4px;}
+.footer .prix{display:inline-block;width:143px;height:36px;line-height:36px;text-align:center;background: #FFEEE6;border-radius:18px;margin-top:7px;overflow:hidden;}
+.footer .prix .plus,.footer .prix .reduce{float:left;margin:0 3px;}
+.footer .prix .plus:before{font-family: 'second';content:"\51cf";font-size:30px;opacity: 0.4;color: #F85200;}
+.footer .prix .reduce{float:right;}
+.footer .prix .reduce:before{font-family: 'second';content:"\52a0";font-size:30px;color:#f85200;opacity:1;}
+.footer .prix var{font-size:16px;color:#f85200;}
+.footer .bidding{position:relative;display:block;width:85px;height:36px;line-height:36px;border-radius:18px;background:#f85200;font-size:16px;color:#fff;text-align:center;margin:7px 0 0 15px;}
+.footer .bidding:before{position:absolute;top:-15px;right:40px;width:6px;height:6px;content:"";border-right:1px solid #F85200;border-top:1px solid #f85200;background: rgba(255,255,255,0.95);-webkit-transform: rotate(136deg);transform: rotate(136deg);}
+
+
+
+
+
+
+
+
+

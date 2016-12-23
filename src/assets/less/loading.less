@@ -1,0 +1,69 @@
+.jump-cover{position: fixed;left:0;top:0;width: 100%;height:100%;z-index: 1001;background: #f5f5f5;}
+.jump-cover .loading{position: absolute;margin:0;left:50%;top:50%;-webkit-transform: translate3d(-50%,-50%,0);transform: translate3d(-50%,-50%,0);}
+
+.loading{display: none;position: relative;margin:8px auto 5px;width:85px;padding-top: 33px;font-size: 0;color: #999; overflow: hidden; text-align: center; 
+    background: url(../img/loadBg.png) no-repeat 50% 0;
+    -webkit-background-size: 192px 30px;background-size: 192px 30px;-webkit-animation: loaing-animation linear 1.5s infinite; animation: loaing-animation linear 1.5s infinite;}
+.loading:before{content: '';position: absolute;left: 0;top: 0;width: 100%;height: 30px;
+background: -webkit-gradient(linear, 0 0, 100% 0,from(#f5f5f5), color-stop(0.1, rgba(245,245,245,0)), color-stop(0.9, rgba(245,245,245,0)),to(#f5f5f5));
+    background: linear-gradient(90deg,#f5f5f5 0, rgba(245,245,245,0) 10%, rgba(245,245,245,0) 90%,#f5f5f5 100%);
+}
+.loading:after{content: '正在加载中...';font-size: 14px;}
+.loading.visible{display: block;}
+.loading-ring{content: '';position: absolute;left: 50%;top:9px;margin-left: -27px;width: 49px; height:18px;font-size: 0;
+background: url(../img/loadCar.png) no-repeat 0 0;
+-webkit-background-size: 49px 18px;background-size: 49px 18px;}
+.loading-ring:before,.loading-ring:after{content: '';position: absolute;left: 19px;top: 16px;width: 5px; height: 5px;
+background: url(../img/loadGl.png) no-repeat 0 0;
+-webkit-background-size: 5px 5px;background-size: 5px 5px; -webkit-animation: wheel linear 0.2s infinite; animation: wheel linear 0.2s infinite; }
+.loading-ring:after{left: 40px;}
+ @-webkit-keyframes loaing-animation {
+    0% { background-position: 10% 0;}
+    100% {background-position: 100% 0; }
+}
+@keyframes loaing-animation {
+    0% { background-position: 10% 0;}
+    100% {background-position: 100% 0; }
+}
+
+@-webkit-keyframes wheel{
+    0% {-webkit-transform:rotate(0deg);}
+    100% {-webkit-transform:rotate(360deg);}
+}
+@keyframes wheel{
+    0% {transform:rotate(0deg);}
+    100% {transform:rotate(360deg);}
+}
+
+.noDataBox{
+  margin: 40% auto 0;
+  display: block;
+  width: 140px;
+  color: #c8c8cd;
+  text-align: center;
+}
+.noDataBox:before{
+  content: '\8f66';
+  font-family: 'saas_ico';
+  font-size: 64px;
+  display: block;
+}
+.noDataBox:after{
+  content: '～没有数据～';
+  display: block;
+}
+.noDataBoxaft:after{
+  display: none;
+}
+.noDataBoxaft{
+  width: 200px;
+  p{color: #666;}
+} 
+
+.noMor{
+    height: 60px;
+    line-height: 60px;
+    font-size: 13px;
+    text-align: center;
+    color: #C5C5C5;
+}
