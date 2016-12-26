@@ -1,21 +1,16 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import Navbar from 'COMPONENT/Navbar/'
-import { dataTimeFormatter} from 'UTIL/dateTimeFormatter'
+import Navbar from '../Navbar/index'
+import { dataTimeFormatter} from '../../utils/dateTimeFormatter'
 import { Link } from 'react-router'
-import { Tool } from 'UTIL/errMsg'
-// import { LoadBox } from 'VIEW/more'
-import { injectReducer } from 'REDUCER'
+import { Tool, Alert } from '../../utils/tool'
+import { LoadBox } from '../../views/more'
+import XHR from '../../services/service'
 
-injectReducer('myMsg', require('REDUCER/mi/').default)
-@connect(
-  ({ myMsg }) => ({ myMsg }),
-  require('ACTION/mi/').default
-)
 export default class Welcomes extends Component {
   constructor (props) {
     super(props)
     this.state = {
+      isData: true,
       myBids: [],
       myWins: [],
       myDepos: [],
@@ -24,24 +19,62 @@ export default class Welcomes extends Component {
   }
   componentWillMount () {
     let sessionId = Tool.localItem('sessionId')
-    this.props.ismyBids(sessionId)
-    this.props.ismyWins(sessionId)
-    this.props.ismyDepos(sessionId)
-    this.props.ismyReminds(sessionId)
+    XHR.myBid(1)
+    .then((db) => {
+      if (!db) return
+      let res = JSON.parse(db)
+      if (res.status === 1) { 
+        alert(res.data)
+        // window.location.href = 'http://tao-yufabu.360che.com/member'
+        return
+      }
+      this.setState({myBids: res.data})
+    })
+    XHR.myWin(1)
+    .then((db) => {
+      if (!db) return
+      let res = JSON.parse(db)
+      if (res.status === 1) { 
+        alert(res.data)
+        // window.location.href = 'http://tao-yufabu.360che.com/member'
+        return
+      }
+      this.setState({myWins: res.data})
+    })
+    XHR.myDep(1)
+    .then((db) => {
+      if (!db) return
+      let res = JSON.parse(db)
+      if (res.status === 1) { 
+        alert(res.data)
+        // window.location.href = 'http://tao-yufabu.360che.com/member'
+        return
+      }
+      this.setState({myDepos: res.data})
+    })
+    XHR.myRem(1)
+    .then((db) => {
+      if (!db) return
+      let res = JSON.parse(db)
+      if (res.status === 1) { 
+        alert(res.data)
+        // window.location.href = 'http://tao-yufabu.360che.com/member'
+        return
+      }
+      this.setState({myReminds: res.data,isData: false})
+    })
+
   }
   componentWillUnmount () {
     
   }
-  componentWillReceiveProps(nextProps) {
-      this.setState({ 
-        myBids: nextProps.myMsg.myBids,
-        myWins: nextProps.myMsg.myWins,
-        myDepos: nextProps.myMsg.myDepos,
-        myReminds: nextProps.myMsg.myReminds
-      })
-  }
+
   render () {
-    let {myBids, myWins, myDepos, myReminds} = this.state
+    let footer = null
+    let {isData, myBids, myWins, myDepos, myReminds} = this.state
+    if(isData){
+        footer = <LoadBox />
+    }
     return (
       <div style={{height: '100%'}}>
         <div className="BoxBt55">
@@ -49,7 +82,7 @@ export default class Welcomes extends Component {
           <ul className="swiper">
             {myBids.map(db =>
             <li>
-              <a href={`/truck/${db.salesroom_id}/${db.truck_id}`}>
+              <a href={`#truck/${db.salesroom_id}/${db.truck_id}`}>
                 <figure>
                   <img src={`http://imgb.360che.com${db.src}`} alt="" />
                 <figcaption>{db.fullname}</figcaption>
@@ -121,9 +154,22 @@ export default class Welcomes extends Component {
             )}
           </ul>
         </div>
-        <Navbar style={{top: '-60px'}}/>
+        <Navbar style={{top: '-50px'}}/>
+        {footer}
+        <div id="iosDialog1" style={{display: 'none'}}>
+            <div className="weui-mask"></div>
+            <div className="weui-dialog">
+                <div className="weui-dialog__hd"><strong className="weui-dialog__title">确认删除提醒？</strong></div>
+                <div className="weui-dialog__bd" style={{display: 'none'}}></div>
+                <div className="weui-dialog__ft">
+                    <a href="javascript:;" className="weui-dialog__btn weui-dialog__btn_default">确认删除</a>
+                    <a href="javascript:;" className="weui-dialog__btn weui-dialog__btn_primary">暂不删除</a>
+                </div>
+            </div>
+        </div>
       </div>
     )
   }
 }
+
 

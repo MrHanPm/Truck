@@ -42,6 +42,7 @@ class XHR {
 // salesroom_id  int 是 拍卖场id
 // truck_id  int 是 卡车id
 // name  string  是 保证金缴纳者姓名
+// mobile
 // city_id int 是 缴纳者所在城市id
   cotPay (json) {
     return xhr({ 
@@ -50,7 +51,14 @@ class XHR {
               body: json
           })
   }
-
+// 支付页面
+// order_id  string  是 定金支付订单号
+  goPay (orderId) {
+    return xhr({ 
+              url: API.goPay(orderId),
+              type: 'get'
+          })
+  }
 // 拍卖场卡车列表
   getSrom (roomId, page) {
     return xhr({ 

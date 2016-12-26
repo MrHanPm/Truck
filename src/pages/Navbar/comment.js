@@ -17,7 +17,7 @@ export default class Navbar extends Component {
         <span className="return" onClick ={() => {window.history.back()}}></span>
         <Link className="comment-on" style={{display: isHide ? 'none' : ''}} to={`/review/${this.props.roomId}/${this.props.truId}`}>{text}</Link>
         <em className="comment-on" style={{display: isHide ? '' : 'none'}} onClick ={() => this.props.onSave()}>{text}</em>
-        <Link className="menu" to="/index"></Link>
+        <Link className="menu" to="/index" style={{display: 'none'}}></Link>
       </div>
     )
   }

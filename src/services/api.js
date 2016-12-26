@@ -25,7 +25,10 @@ class API {
   cotPay () {
     return `${HTTP}/deposite/create?session_id=${SESSIONID}`
   }
-
+// 支付页面
+  goPay (orderId) {
+    return `${HTTP}/pay/deposite/${orderId}?session_id=${SESSIONID}`
+  }
 // 获取专场汽车列表 
   getSrom (roomId, page) {
     return `${HTTP}/salesroom/trucks/${roomId}/${page}/10?session_id=${SESSIONID}`

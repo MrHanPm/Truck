@@ -11,23 +11,23 @@ import App from './pages/App'
 import Welcome from './pages/Welcome'
 import TruckList from './pages/Room/'
 import TruckMsg from './pages/Truck/'
-// import TruckReport from './pages/Truck/report'
-// import TruckDetail from './pages/Truck/detail'
-// import TruckImage from './pages/Room/image'
-// import Auction from './pages/Room/auction'
+import TruckReport from './pages/Truck/report'
+import TruckDetail from './pages/Truck/detail'
+import TruckImage from './pages/Room/image'
+import Auction from './pages/Room/auction'
 
 // import BidRecord from './pages/BidRecord'
-// import MarginDetails from './pages/MarginDetails'
-// import Margin from './pages/Margin'
+import MarginDetails from './pages/MarginDetails'
+import Margin from './pages/Margin'
 // import Comment from './pages/Comment'
 import Clock from './pages/Form/clock'
-// import Pay from './pages/Form/pay'
+import Pay from './pages/Form/pay'
 // import Review from './pages/Form/review'
-// import About from './views/about'
-// import Protocol from './pages/Protocol'
+import About from './views/about'
+import Protocol from './pages/Protocol'
 import Url from './pages/url'
 import Addres from './pages/address'
-// import Ok from './views/ok'
+import Ok from './views/ok'
 
 import Err from './pages/404'
 
@@ -39,8 +39,17 @@ ReactDOM.render((
         <Route path="room/:id" component={TruckList}/>
         <Route path="truck/:roomId/:truId" component={TruckMsg}/>
         <Route path="clock/:roomId(/:truId)" component={Clock}/>
+        <Route path="pay/:roomId/:truId/:amount(/:yn)" component={Pay}/>
+        <Route path="room/truck/:truckId" component={TruckImage}/>
+        <Route path="report/:truId" component={TruckReport}/>
+        <Route path="detail/:modelId" component={TruckDetail}/>
+        <Route path="auction" component={Auction}/>
+        <Route path="marginDetails/:depositeId" component={MarginDetails}/>
+        <Route path="margin/:bidId" component={Margin}/>
 
-
+        <Route path="about" component={About}/>
+        <Route path="protocol(/:msg)" component={Protocol}/>
+        <Route path="ok" component={Ok}/>
         <Route path="addres" component={Addres}/>
         <Route path="*" component={Err}/>
       </Route>
@@ -48,20 +57,16 @@ ReactDOM.render((
 ), MOUNT_NODE)
 
 
-//         <Route path="report/:truId" component={TruckReport}/>
-//         <Route path="detail/:modelId" component={TruckDetail}/>
-//         <Route path="room/truck/:truckId" component={TruckImage}/>
-//         <Route path="auction" component={Auction}/>
+
+//         
+//         
 //         <Route path="bidRecord/:roomId/:truId" component={BidRecord}/>
-//         <Route path="marginDetails/:depositeId" component={MarginDetails}/>
-//         <Route path="margin/:bidId" component={Margin}/>
+//         
 //         <Route path="comment/:roomId/:truId" component={Comment}/>
 //         
-//         <Route path="pay/:roomId/:truId/:amount(/:yn)" component={Pay}/>
+//         
 //         <Route path="review/:roomId/:truId" component={Review}/>
-//         <Route path="about" component={About}/>
-//         <Route path="protocol" component={Protocol}/>
-//         <Route path="ok" component={Ok}/>
+//         
 /*
   <IndexRoute path="url" component={Url}/>
   当前路由树如下    

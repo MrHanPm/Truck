@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import handleChange from '../../utils/handleChange'
-import { Alert, Tool } from '../../utils/tool'
+import { Alert, Tool, AllMsgToast } from '../../utils/tool'
 // import { Link } from 'react-router'
 import Navbar from '../Navbar/pay'
 import XHR from '../../services/service'
@@ -12,97 +12,109 @@ export default class TruckList extends Component {
   constructor (props) {
     super(props)
     this.state = {
+        'salesroom_id':0,
+        'truck_id':0,
+        'city_id': 0,
         name: '',
-        tel: '',
-        'city_id': '',
+        mobile: '',
+
         pay: '',
+        truName:'',
         protocol: 0,
         about: 0
     }
     this.handleChange = handleChange.bind(this)
+    this.goAddress = this.goAddress.bind(this)
     this.createPay = this.createPay.bind(this)
     this.SaveData = this.SaveData.bind(this)
     this.CheckForm = this.CheckForm.bind(this)
+
   }
   componentWillMount () {
-    let { params: { amount } } = this.props
-    let names = Tool.localItem('name')
-    let hash = window.location.hash
-    if (hash == '#1') {
-        if (names === null) {
-            this.setState({
-                pay: amount,
-                protocol: 1
-            })
-        } else {
-            this.setState({
-                pay: amount,
-                name: names,
-                protocol: 1
-            })
-        }
-    } else {
-        if (names === null) {
-            this.setState({
-                pay: amount
-            })
-        } else {
-            this.setState({
-                pay: amount,
-                name: names
-            })
-        }
-    }
+    let { params: { roomId, truId, amount, yn } } = this.props
+    let names = Tool.localItem('NAME')
+    let CITYID = JSON.parse(Tool.localItem('CITYID'))
+    let USERINFO = JSON.parse(Tool.localItem('USERINFO'))
+    this.setState({
+        name: names ? names : USERINFO.nickname,
+        pay: amount,
+        truName: CITYID ? CITYID.name : '',
+        'salesroom_id':roomId,
+        'truck_id':truId,
+        'city_id': CITYID ? CITYID.val : '',
+        protocol: yn ? 1 : 0,
+        mobile: USERINFO.mobile
+    })
   }
   componentDidMount() {
 
   }
   checkForm () {
     let nam = (this.state.name).replace(/\s+$|^\s+/g, '')
-    let regHZ = /^[\u2E80-\u9FFF]+$/
+    // let regHZ = /^[\u2E80-\u9FFF]+$/
     if (nam == '') {
-        ErrMsg.to('姓名不能为空')
+        Alert.to('姓名不能为空')
         return false
     }
-    if (regHZ.test(nam)) {
+    // if (regHZ.test(nam)) {
 
-    } else {
-        ErrMsg.to('姓名必须是中文')
+    // } else {
+    //     Alert.to('姓名必须是中文')
+    //     return false
+    // }
+    // if (nam.length > 6) {
+    //     Alert.to('姓名过长')
+    //     return false
+    // }
+    if(!Tool.checkPhone(this.state.mobile)){
+        Alert.to('手机号不正确')
         return false
     }
-    if (nam.length > 6) {
-        ErrMsg.to('姓名过长')
+    if (this.state.city_id === 0) {
+        Alert.to('地址不能为空')
         return false
     }
-    if (this.state.city_id == '') {
-        ErrMsg.to('地址不能为空')
+    if (this.state.protocol === 0) {
+        Alert.to('请同意竞拍服务协议')
         return false
     }
-    if (this.state.protocol == 0) {
-        ErrMsg.to('请同意竞拍服务协议')
-        return false
-    }
-    if (this.state.about == 0) {
-        ErrMsg.to('请同意保证金规则')
+    if (this.state.about === 0) {
+        Alert.to('请同意保证金规则')
         return false
     }
     return true
   }
   createPay () {
     if (this.checkForm()) {
-        let { params: { roomId, truId } } = this.props
-        let sessionId = Tool.localItem('sessionId')
-        payService
-        .createPay(sessionId, roomId, truId, this.state.name, this.state.city_id)
-        .then(msg => {
-           return this.context.router.replace('/ok')
+        let json = this.state
+        XHR.cotPay(json)
+        .then((db) => {
+          if (!db) return
+          let res = JSON.parse(db)
+          if (res.status === 1) { 
+            alert(res.data)
+            window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+          }
+          XHR.goPay(res.data)
         })
     }
   }
+  goAddress () {
+    let pathname = window.location.hash
+    Tool.localItem('URL', pathname)
+    Tool.localItem('NAME', this.state.name)
+    this.context.router.replace('/addres')
+  }
   SaveData () {
-    let pathname = window.location.pathname
-    Tool.localItem('pathname', pathname)
-    Tool.localItem('name', this.state.name)
+    let pathname = window.location.hash
+    let url = pathname
+    // console.log(this.props.params.yn)
+    if(this.props.params.yn){
+        url = pathname.substring(0,pathname.indexOf('?')-2)
+    }
+    Tool.localItem('URL', url)
+    Tool.localItem('NAME', this.state.name)
     return this.context.router.replace('/protocol')
   }
   CheckForm (e) {
@@ -117,7 +129,7 @@ export default class TruckList extends Component {
     }
   }
   render () {
-    let { name, protocol, about } = this.state
+    let { name, protocol, about, truName, mobile } = this.state
     return (
     <div style={{height: '100%'}}>
         <div className="BoxBt55">
@@ -131,18 +143,18 @@ export default class TruckList extends Component {
                         maxLength="6"
                         onChange={this.handleChange} />
                 </li>
-                <li style={{display: 'none'}}>
+                <li>
                     <label>手机</label>
                     <input type="tel"
-                        name="tel"
+                        name="mobile"
                         placeholder="请输入联系人手机"
-                        value={this.state.tel}
+                        value={mobile}
                         maxLength="11"
                         onChange={this.handleChange} />
                 </li>
-                <li>
+                <li onClick={this.goAddress}>
                     <label>所在地</label>
-                    <input type="text" placeholder="请选择地点" />
+                    <input type="text" placeholder="请选择地点" value={truName} disabled="true" />
                 </li>
             </ul>
             <div className="sign-up-pay">
@@ -161,7 +173,7 @@ export default class TruckList extends Component {
                 </div>
                 <div className="agree-module">
                     <input type="checkbox" name="about" checked={about ? 'checked' : '' } onClick={this.CheckForm} />
-                    <span className="agree-rule">同意<a href="/about">《保证金规则》</a></span>
+                    <span className="agree-rule">同意<a href="#about">《保证金规则》</a></span>
                 </div>
             </div>
             <div className="sign-module">

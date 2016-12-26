@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
 // import { Link } from 'react-router'
-import { dataTimeFormatter} from 'UTIL/dateTimeFormatter'
-import { Tool } from 'UTIL/errMsg'
-
-
-
+import { dataTimeFormatter} from '../utils/dateTimeFormatter'
+import { Tool } from '../utils/tool'
 
 
 export default class TruckList extends Component {
@@ -17,7 +14,7 @@ export default class TruckList extends Component {
   componentWillMount () {
     let sessionId = Tool.localItem('sessionId')
     let { params: { bidId } } = this.props
-    this.props.ismyWinsMsg(sessionId, bidId)
+    
   }
   componentDidMount() {
 

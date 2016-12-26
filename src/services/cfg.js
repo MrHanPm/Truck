@@ -20,8 +20,12 @@ export const getWxConfig = {
 
 /*本地存储数据名称表(Tool.localItem)
 
-SESSIONID
-USERINFO
-CITYID   城市id
+CITYID  {name:'鄂尔多斯市',val:150600}
+SESSIONID   84336cbcb894abee6c46e85d62fe18596b0eaa55
+USERINFO    {"uid":"487992","nickname":"arui128","email":"","mobile":"13520344997"}
+
+URL   
+
+TRUCK
 */
 

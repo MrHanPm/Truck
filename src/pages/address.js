@@ -5,6 +5,9 @@ import { LoadBox } from '../views/more'
 
 
 export default class Addres extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -22,8 +25,8 @@ export default class Addres extends Component {
       let res = JSON.parse(db)
       let AZ = []
       let DATA = []
-      if (res.status === 1) { 
-        alert('登录超时～')
+      if (res.status === 1) {
+        alert(res.data)
         window.location.href = 'http://tao-yufabu.360che.com/member'
         return
       }
@@ -59,8 +62,12 @@ export default class Addres extends Component {
       }, false)
   }
   Citys(e) {
-    Tool.localItem('CITYID', e.target.dataset.cityid)
-    window.history.back()
+    let json = `{"name":"${e.target.innerHTML}","val":"${e.target.dataset.cityid}"}`
+    let pathname = Tool.localItem('URL')
+    let url = pathname.substring(1,pathname.indexOf('?'))
+    
+    Tool.localItem('CITYID', json)
+    this.context.router.replace(url)
   }
   Liclick(e){
     try{

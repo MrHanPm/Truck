@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 // import { Link } from 'react-router'
 import handleChange from '../../utils/handleChange'
-import { Alert, Tool } from '../../utils/tool'
+import { Alert, Tool, AllMsgToast } from '../../utils/tool'
 import Navbar from '../Navbar/yesNo'
 import XHR from '../../services/service'
 
@@ -47,29 +47,43 @@ export default class TruckList extends Component {
   }
   radios (e) {
     let nub = e.target.value
-    if (nub > 300) {
-        this.setState({
-            end_difference: nub
-        })
+    // console.log(e.target.checked)
+    if (e.target.value > 300) {
+        if(e.target.checked){
+            this.setState({
+                end_difference: e.target.value
+            })
+        } else {
+            this.setState({
+                end_difference: 0
+            })
+        }
     } else {
-        this.setState({
-            start_difference: nub
-        })
+        if(e.target.checked){
+            this.setState({
+                start_difference: e.target.value
+            })
+        } else {
+            this.setState({
+                start_difference: 0
+            })
+        }
     }
   }
   crtClick () {
     if (this.checkForm()) {
         let db = this.state
-        console.log(db)
+        // console.log(db)
         XHR.myRemCrt(db)
         .then((db) => {
             if (!db) return
             let res = JSON.parse(db)
-            if (res.status === 1) { 
+            if (res.status === 1) {
                 alert('登录超时～')
                 window.location.href = 'http://tao-yufabu.360che.com/member'
                 return
             }
+            AllMsgToast.to('设置成功')
             window.history.back()
         })
     }

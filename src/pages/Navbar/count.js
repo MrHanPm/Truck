@@ -19,7 +19,7 @@ export default class Navbar extends Component {
           <em className="reduce" onClick={() => this.props.OnSale(1)}></em>
         </span>
         <i className="bidding" onClick={() => this.props.goPay()}>出价</i>
-        <Link className="menu" to="/index"></Link>
+        <Link className="menu" to="/index" style={{display: 'none'}}></Link>
         <div className="countdown">
           <div className="Box">
             <span className="present">

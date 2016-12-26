@@ -14,7 +14,7 @@ export default class Navbar extends Component {
         <div className="sign-end" style={{display: this.props.show ? 'none' : ''}}>
           <h4>已经结束</h4>
         </div>
-        <Link className="menu" to="/index"></Link>
+        <Link className="menu" to="/index" style={{display: 'none'}}></Link>
       </div>
     )
   }

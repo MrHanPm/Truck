@@ -1,14 +1,8 @@
 import React, { Component } from 'react'
 // import { Link } from 'react-router'
 
-import Navbar from 'COMPONENT/Navbar/roomfot'
-// import { injectReducer } from 'REDUCER'
-// injectReducer('room', require('REDUCER/room/').default)
+import Navbar from '../Navbar/roomfot'
 
-// @connect(
-//   ({ room }) => ({ room }),
-//   require('ACTION/room').default
-// )
 
 export default class TruckList extends Component {
 
@@ -181,7 +175,7 @@ export default class TruckList extends Component {
                 </li>
             </ul>
         </div>
-        <Navbar style={{top: '-60px'}}/>
+        <Navbar style={{top: '-50px'}}/>
     </div>
     )
   }

@@ -1,15 +1,8 @@
 import React, { Component } from 'react'
 // import { Link } from 'react-router'
-import { Tool } from 'UTIL/errMsg'
-import { connect } from 'react-redux'
-import Navbar from 'COMPONENT/Navbar/roomfot'
-import { injectReducer } from 'REDUCER'
-injectReducer('truckMsg', require('REDUCER/truck/').default)
-
-@connect(
-  ({ truckMsg }) => ({ truckMsg }),
-  require('ACTION/truck/').default
-)
+import { Tool } from '../../utils/tool'
+import XHR from '../../services/service'
+import Navbar from '../Navbar/roomfot'
 
 export default class TruckList extends Component {
   constructor (props) {
@@ -19,19 +12,12 @@ export default class TruckList extends Component {
     }
   }
   componentWillMount () {
-    let sessionId = Tool.localItem('sessionId')
+    
     let { params: { modelId } } = this.props
-    this.props.modeMsg(sessionId, modelId)
+    // this.props.modeMsg(sessionId, modelId)
   }
   componentDidMount() {
 
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.truckMsg.mode) {
-        this.setState({ 
-            DB: nextProps.truckMsg.mode
-        })
-    }
   }
   render () {
     let { DB } = this.state
@@ -81,7 +67,7 @@ export default class TruckList extends Component {
                 </ul>
             </div>
         </div>
-        <Navbar style={{top: '-60px'}}/>
+        <Navbar style={{top: '-50px'}}/>
     </div>
     )
   }

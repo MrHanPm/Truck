@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 
-import { dataTimeFormatter, dataTimeCountdown} from '../../utils/dateTimeFormatter'
+import { dataTimeFormatter, dataTimeCountdown, isState} from '../../utils/dateTimeFormatter'
 import Navbar from '../Navbar/count'
 import NavbarPay from '../Navbar/roomfot'
+import Heads from '../Room/Head'
 import { Link } from 'react-router'
 import { Tool, Alert } from '../../utils/tool'
 import XHR from '../../services/service'
@@ -32,6 +33,8 @@ export default class TruckMsg extends Component {
     }
     this.OnSale = this.OnSale.bind(this)
     this.goPay = this.goPay.bind(this)
+    this.MSG = this.MSG.bind(this)
+    this.setIsPay = this.setIsPay.bind(this)
     this.Pay = this.Pay.bind(this)
     this.selRoom = this.selRoom.bind(this)
   }
@@ -62,6 +65,14 @@ export default class TruckMsg extends Component {
         })
     }
   }
+  MSG () {
+    let json = {}
+    json.paid_for_deposite = this.state.data.truck.paid_for_deposite
+    json.status = this.state.data.truck.status
+    json.deposite = this.state.data.truck.on_sale.deposite
+    json.roomId = this.state.data.salesroom.id
+    Tool.localItem('TRUCK', JSON.stringify(json))
+  }
   OnSale (nu) {
     if (nu) {
         let newP = this.state.pay + this.state.increase
@@ -75,19 +86,22 @@ export default class TruckMsg extends Component {
         }
     }
   }
+  setIsPay (e) {
+    console.log(e)
+  }
   goPay () {
-    let sessionId = Tool.localItem('sessionId')
     let { params: { roomId, truId } } = this.props
     let url = `/pay/${roomId}/${truId}/${this.state.pay}`
     payService
-    .bidPay(sessionId, roomId, truId, this.state.pay)
+    .bidPay( roomId, truId, this.state.pay)
     .then(msg => {
       if (msg) return this.context.router.replace(url)
     })
   }
   Pay () {
     let { params: { roomId, truId } } = this.props
-    let url = `/pay/${roomId}/${truId}/${this.state.data.truck.on_sale.deposite}`
+    let nub = parseInt(this.state.data.truck.on_sale.deposite)
+    let url = `/pay/${roomId}/${truId}/${nub}`
     this.context.router.replace(url)
   }
   componentWillReceiveProps(nextProps) {
@@ -116,7 +130,7 @@ export default class TruckMsg extends Component {
                                 numb={truck.on_sale.deposite}
                                 Pay={this.Pay}/>
     }
-    if (false) {
+    if (truck.paid_for_deposite) {
         footBtn = <Navbar nowPrice={truck.current_price}
                     OnSale = {this.OnSale}
                     goPay = {this.goPay}
@@ -130,7 +144,7 @@ export default class TruckMsg extends Component {
                 <ul className="swiper-wrapper" style={{width: `${Widths * pictures.length}px`}}>
                     { pictures.map((db, index) =>
                     <li className="swiper-slide" style={{width: `${Widths}px`}}>
-                        <Link to={`/room/truck/${truck.id}`}>
+                        <Link to={`/room/truck/${truck.id}`} onClick={this.MSG}>
                         <figure><img src={`http://imgb.360che.com${db.src}`} alt="" /></figure>
                         <span className="swiper-pagination">{`${index + 1}/${pictures.length}`}</span>
                         </Link>
@@ -138,12 +152,12 @@ export default class TruckMsg extends Component {
                     )}
                 </ul>
                 </div>
-                <var className="underway"
-                    style={{display: salesroom.status == 3 ? '' : 'none'}}>正在进行</var>
+                <var className="underway" id={`Und${salesroom.id}`}
+                style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'underway' ? '' : 'none'}}>正在进行</var>
                 <var className="begin" 
-                    style={{display: salesroom.status == 2 ? '' : 'none'}}>即将开始</var>
-                <var className="finish"
-                    style={{display: salesroom.status == 4 ? '' : 'none'}}>已经结束</var>
+                style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'begin' ? '' : 'none'}}>即将开始</var>
+                <var className="finish" id={`Feg${salesroom.id}`}
+                style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'finish' ? '' : 'none'}}>已经结束</var>
                 <span className="share"></span>
                 <em className="location">{ truck.address }</em>
                 <em className="enshrine" style={{display: 'none'}}>收藏</em>
@@ -155,7 +169,7 @@ export default class TruckMsg extends Component {
                     <em> {truck.current_price} </em><i>万元</i>
                     <span><var>{truck.on_sale.bid_persons}</var>人竞拍</span>
                 </div>
-                <div className="time" id={`Cod${salesroom.id}`} data-st={salesroom.begin_date * 1000} data-et={salesroom.finish_date * 1000}>
+                <div className="time" id={`Cod${salesroom.id}`} onClick={this.setIsPay}>
                     {dataTimeCountdown(salesroom.begin_date * 1000, salesroom.finish_date * 1000, salesroom.id)}
                 </div>
                 <a href={`#clock/${roomId}/${truId}`} className="remind">设置提醒</a>
@@ -219,8 +233,8 @@ export default class TruckMsg extends Component {
                         <i>7</i>
                     </li>
                 </ul>
-                <a href="#" className="deposit">保证金规则<em>未拍到全额退款</em></a>
-                <a href="/about" className="regular">交易规则</a>
+                <a href="#protocol/msg" className="deposit">保证金规则<em>未拍到全额退款</em></a>
+                <a href="#about" className="regular">交易规则</a>
             </div>
 
 
@@ -228,7 +242,7 @@ export default class TruckMsg extends Component {
 
 
             <div className="car-configure">
-                <h3>车辆配置<Link href={`/detail/${truck.model_id}`} className="examine">查看详情</Link></h3>
+                <h3>车辆配置<Link href={`#detail/${truck.model_id}`} className="examine">查看详情</Link></h3>
                 <ul className="configure-list">
                     <li>
                         <span>驱动形式<i>6X4</i></span>
@@ -245,7 +259,7 @@ export default class TruckMsg extends Component {
 
 
             <div className="gauging">
-                <h3>车辆检测报告<a href="/report/11" className="examine">查看详情</a></h3>
+                <h3>车辆检测报告<a href="#report/11" className="examine">查看详情</a></h3>
                 <div className="post">
                     <figure><img src="http://usr.im/44x44" alt="" /></figure>
                     <figcaption>评估师: {truck.recondition_operator}</figcaption>
@@ -311,7 +325,6 @@ export default class TruckMsg extends Component {
                 <a href={`/review/${roomId}/${truId}`} className="know">我看过车，我来点评</a>
             </div>
 
-
             <div className="same">
                 <div className="title">
                     <span className="change">
@@ -320,8 +333,8 @@ export default class TruckMsg extends Component {
                     </span>
                 </div>
                 <ul className="car-list" style={{display: isRoom ? '' : 'none'}}>
-                    { otherTrucks.map(db =>
-                    <li>
+                    { otherTrucks.map((db,index) =>
+                    <li key={index}>
                         <Link to={`/truck/${roomId}/${db.truck_id}`}>
                         <figure>
                             <img src={`http://imgb.360che.com${db.src}`} alt="" />
@@ -337,24 +350,8 @@ export default class TruckMsg extends Component {
                     </li>
                     )}
                 </ul>
-                <ul className="car-list" style={{display: isRoom ? 'none' : ''}}>
-                    { otherSalesroom.map(db =>
-                    <li>
-                        <Link to={`/truck/${db.salesroom_id}/${db.truck_id}`}>
-                        <figure>
-                            <img src={`http://imgb.360che.com${db.src}`} alt="" />
-                        </figure>
-                        <figcaption>{db.fullname}</figcaption>
-                        <em>{db.explain}</em>
-                        <em>出价{db.bid_count}次/{db.bid_persons}人竞拍</em>
-                        <div className="price">
-                            <span>评估价:{db.sale_price}万</span>
-                            <span>当前价:<var>{db.cur_price}</var>万</span>
-                        </div>
-                        </Link>
-                    </li>
-                    )}
-                </ul>
+                
+                <div style={{display: isRoom ? 'none' : ''}}><Heads DATA={otherSalesroom}/></div>
             </div>
         </div>
         {footBtn}
