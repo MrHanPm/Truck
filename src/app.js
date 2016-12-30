@@ -16,13 +16,13 @@ import TruckDetail from './pages/Truck/detail'
 import TruckImage from './pages/Room/image'
 import Auction from './pages/Room/auction'
 
-// import BidRecord from './pages/BidRecord'
+import BidRecord from './pages/BidRecord'
 import MarginDetails from './pages/MarginDetails'
 import Margin from './pages/Margin'
-// import Comment from './pages/Comment'
+import Comment from './pages/Comment'
 import Clock from './pages/Form/clock'
 import Pay from './pages/Form/pay'
-// import Review from './pages/Form/review'
+import Review from './pages/Form/review'
 import About from './views/about'
 import Protocol from './pages/Protocol'
 import Url from './pages/url'
@@ -46,7 +46,10 @@ ReactDOM.render((
         <Route path="auction" component={Auction}/>
         <Route path="marginDetails/:depositeId" component={MarginDetails}/>
         <Route path="margin/:bidId" component={Margin}/>
-
+        <Route path="bidRecord/:roomId/:truId" component={BidRecord}/>
+        
+        <Route path="comment/:roomId/:truId" component={Comment}/>
+        <Route path="review/:roomId/:truId(/:pid)" component={Review}/>
         <Route path="about" component={About}/>
         <Route path="protocol(/:msg)" component={Protocol}/>
         <Route path="ok" component={Ok}/>
@@ -57,16 +60,7 @@ ReactDOM.render((
 ), MOUNT_NODE)
 
 
-
-//         
-//         
-//         <Route path="bidRecord/:roomId/:truId" component={BidRecord}/>
-//         
-//         <Route path="comment/:roomId/:truId" component={Comment}/>
-//         
-//         
-//         <Route path="review/:roomId/:truId" component={Review}/>
-//         
+       
 /*
   <IndexRoute path="url" component={Url}/>
   当前路由树如下    

@@ -1,81 +1,148 @@
 import React, { Component } from 'react'
 // import { Link } from 'react-router'
-import { Tool } from 'UTIL/errMsg'
-
-import Navbar from 'COMPONENT/Navbar/comment'
-
+import { Tool, Alert } from '../utils/tool'
+import { Loading, NoMor, NoData, LoadBox} from '../views/more'
+import handleScroll from '../utils/handleScroll'
+import Navbar from './Navbar/comment'
+import { getTYP } from '../utils/posName'
+import XHR from '../services/service'
 
 export default class TruckList extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
+        isData: false,
+        isLoading: true, // 加载动画
+        iaLod: false,  // 是否加载
+        nowPage: 1,
+
+        TruckName: '',
+
+        COMM:[],
         MDB: []
     }
+    this.handleScroll = handleScroll.bind(this)
+    this.goComm = this.goComm.bind(this)
   }
   componentWillMount () {
     let { params: { roomId, truId } } = this.props
-    let sessionId = Tool.localItem('sessionId')
-    let json = {
-        'action': 'tao',
-        'method': 'comments',
-        'salesroom_id': roomId,
-        'truck_id': truId,
-        'page': '',
-        'items': '',
-        'session_id': sessionId
-    }
-    this.props.getPosts(json)
+    let Names = Tool.localItem('TRUCK')
+    let json = {}
+    json.salesroom_id = roomId
+    json.truck_id = truId
+    json.page = 1
+    json.items = 20
+    XHR.getPostsList (json)
+    .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        if(res.data.posts.length === 0){
+            this.setState({
+                isData: true,
+                TruckName: Names
+            })
+        } else {
+            this.setState({
+                TruckName: Names,
+                COMM: res.data.posts,
+                MDB: res.data.tags,
+                nowPage: 2,
+                iaLod: res.data.posts.length < 10 ? false : true,
+                isLoading: res.data.posts.length < 10 ? false : true
+            })
+        }
+    })
   }
   componentDidMount() {
 
   }
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-        MDB: nextProps.room.posts
-    })
+  goComm (e) {
+    let { params: { roomId, truId } } = this.props
+    let url = `/review/${roomId}/${truId}/${e.target.dataset.pid}`
+    this.context.router.replace(url)
+  }
+  upDATA () {
+    let { params: { roomId, truId } } = this.props
+    let { nowPage, iaLod, isData, isLoading, COMM } = this.state
+    let json = {}
+        json.salesroom_id = roomId
+        json.truck_id = truId
+        json.page = nowPage
+        json.items = 20
+    if(iaLod) {
+      this.setState({iaLod:false})
+      XHR.getPostsList(json)
+      .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        nowPage++
+        COMM.push(...res.data.posts)
+        if(res.data.posts.length < 20) {
+          this.setState({
+            COMM: COMM,
+            isLoading: false
+          })
+        }else{
+          this.setState({
+            COMM: COMM,
+            nowPage: nowPage,
+            iaLod: true
+          })
+        }
+      })
+    }
   }
   render () {
     let { params: { roomId, truId } } = this.props
-    let { MDB, MDB: {posts} } = this.state
+    let footer = null
+    let { COMM, MDB, isData, isLoading, TruckName } = this.state
+    if(isData){
+        footer = <NoData />
+    }else{
+        footer = isLoading ? <Loading DATA={COMM.length>0?false:true}/> : <NoMor />
+    }
     return (
-    <div style={{height: '100%'}}>
-        <div className="TrLiBox">
+    <div style={{height:'100%'}}>
+        <div className="TrLiBox boxPb" data-pb="0" onScroll={this.handleScroll}>
             <div className="comment-head">
-                <p>一汽解放 解放J6P牵引车</p>
+                <p>{TruckName}</p>
                 <div className="circum">
-                    <span>车况很好(20)</span>
-                    <span>保养的不错(20)</span>
-                    <span>动力强劲(19)</span>
-                    <span className="bad">外观有轻微损伤(20)</span>
-                    <span className="bad">磨损严重(12)</span>
-                    <span className="bad">有严重撞伤(2)</span>
+                    { MDB.map((db,index) =>
+                    <span className={index > 2 ? 'bad':''} key={index}>{getTYP(db.tag_id)}({db.total})</span>
+                    )}
                 </div>
             </div>
             <ul className="posts-list">
-                <li>
+            { COMM.map((db,index) =>
+                <li key={index}>
                     <div className="info">
-                        <span className={posts.star >= 1 ? 'good current' : 'good'}></span>
-                        <span className={posts.star >= 2 ? 'good current' : 'good'}></span>
-                        <span className={posts.star >= 3 ? 'good current' : 'good'}></span>
-                        <span className={posts.star >= 4 ? 'good current' : 'good'}></span>
-                        <span className={posts.star >= 5 ? 'good current' : 'good'}></span>
-                        <figure><img src="http://usr.im/32x32" alt="" /></figure>
-                        <span className="user-wrap">{posts.author}</span>
+                        <span className={db.star >= 5 ? 'good' : 'good current'}></span>
+                        <span className={db.star >= 4 ? 'good' : 'good current'}></span>
+                        <span className={db.star >= 3 ? 'good' : 'good current'}></span>
+                        <span className={db.star >= 2 ? 'good' : 'good current'}></span>
+                        <span className={db.star >= 1 ? 'good' : 'good current'}></span>
+                        <figure><img src={db.avatar} alt="" /></figure>
+                        <span className="user-wrap">{db.author}</span>
+                    </div>
+                    <div className="comment-mess" style={{display: db.quote.content?'':'none'}}>
+                        <p className="com-xio">{db.quote.content}</p>
                     </div>
                     <div className="content">
-                        <p>{MDB.posts.message}</p>
+                        <p>{db.message}</p>
                     </div>
                     <footer>
-                        <span className="time">17分钟前</span>
-                        <i className="reply">回复</i>
+                        <span className="time">{db.dateline}</span>
+                        <i className="reply" data-pid={db.pid} onClick={this.goComm}>回复</i>
                     </footer>
-                    <div className="comment-mess">
-                    </div>
                 </li>
+                )}
             </ul>
+            {footer}
         </div>
-        <Navbar style={{top: '-60px'}}
-                roomId={roomId}
+        <Navbar roomId={roomId}
                 truId={truId} />
     </div>
     )

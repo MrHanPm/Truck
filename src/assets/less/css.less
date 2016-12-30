@@ -1,9 +1,16 @@
 /*   Mr.Han   */
+::-webkit-scrollbar {display: none;}
 
 html,body,#app{
     width: 100%;
     height: 100%;
     overflow: hidden;
+    -webkit-transform: translateZ(0);
+}
+input[disabled],input:disabled{
+  border:0;
+  background-color:#fff;
+  color:#333;
 }
 /*----------BOX padding-bottom----------*/
 .picture-list,.boxPb,.BoxBt55{
@@ -13,14 +20,24 @@ html,body,#app{
     overflow: hidden;
     overflow-y: scroll;
     -webkit-overflow-scrolling:touch;
+    -webkit-transform: translateZ(0);
 }
-
+#iosDialog{
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+  -webkit-transform: translateZ(0);
+}
 .TrLiBox{
   height: 100%;
   padding-bottom: 10px;
   overflow: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling:touch;
+  -webkit-transform: translateZ(0);
 }
 
 .car-list li img{
@@ -31,8 +48,13 @@ html,body,#app{
 
 .underway,.begin,.finish,.share,.location,.enshrine{
     position: absolute;
+    -webkit-transform: translateZ(0);
 }
-
+.com-xio{
+  font-size: 13px;
+  color: #666;
+  padding: 7px;
+}
 
 /*----------Bid record----------*/
 .bid-list li{
@@ -62,7 +84,7 @@ html,body,#app{
 
 
 .DinHead{
-  height: 101%;
+  height: 100%;
   box-sizing: border-box;
   padding: 55px 0 0;
   overflow: hidden;
@@ -477,12 +499,13 @@ html,body,#app{
 }
 .weui-mask {
   position: fixed;
-  z-index: 1000;
+  z-index: 2000;
   top: 0;
   right: 0;
   left: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
+  -webkit-transform: translateZ(0);
 }
 .weui-mask_transparent {
   position: fixed;
@@ -491,6 +514,7 @@ html,body,#app{
   right: 0;
   left: 0;
   bottom: 0;
+  -webkit-transform: translateZ(0);
 }
 
 .weui-dialog {

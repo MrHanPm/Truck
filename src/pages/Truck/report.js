@@ -1,20 +1,46 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
+import { Tool } from '../../utils/tool'
+import XHR from '../../services/service'
+import { LoadBox} from '../../views/more'
 
-import Navbar from '../Navbar/roomfot'
-
+class Navbar extends Component {
+  render () {
+    return (
+      <div className="comment">
+        <span className="return" onClick ={() => {window.history.back()}}></span>
+        <em className="comment-on" onClick ={() => {window.history.back()}}>去出价</em>
+      </div>
+    )
+  }
+}
 
 export default class TruckList extends Component {
-
-  componentWillMount () {
-    // let { params: { truckId } } = this.props
-    // this.props.getImg(truckId)
+  constructor (props) {
+    super(props)
+    this.state = {
+        isData:false,
+        DB: []
+    }
   }
-  componentDidMount() {
-
+  componentWillMount () {
+    let { params: { truId } } = this.props
+    XHR.getTMsg(truId)
+    .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        if (res.status === 1) { 
+            alert(res.data.error_msg)
+            window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+        }
+        this.setState({
+            isData: true
+        })
+    })
   }
 
   render () {
+    let { isData } = this.state
     return (
     <div style={{height: '100%'}}>
         <div className="BoxBt55">
@@ -25,7 +51,7 @@ export default class TruckList extends Component {
                 <span>检测时间：<i>2016-09-20</i></span>
             </div>
 
-            <div className="basic">
+            <div className="basic" style={{display: 'none'}}>
                 <h3>基本信息</h3>
                 <ul className="basic-list">
                     <li>
@@ -176,6 +202,7 @@ export default class TruckList extends Component {
             </ul>
         </div>
         <Navbar style={{top: '-50px'}}/>
+        <div style={{display: !isData ? '':'none'}}><LoadBox /></div>
     </div>
     )
   }

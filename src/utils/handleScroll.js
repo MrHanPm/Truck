@@ -6,8 +6,8 @@ export default function handleScroll(e) {
     WH  = window.screen.height-PB
     ST = BOX.scrollTop
     F = SH - WH - ST
+    // console.log(this.state.iaLod,F)
     if(F <= 0){
-        console.log(this.state.iaLod)
         if(this.state.iaLod){
             this.upDATA()
         }

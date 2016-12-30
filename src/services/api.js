@@ -1,10 +1,16 @@
-import { HTTP } from './xhr/config'
-var SESSIONID = localStorage.getItem('SESSIONID')
+import { HTTP, HURL } from './xhr/config'
+var SESSIONID
+let hase = window.location.pathname
+if (hase.length > 6) {
+  SESSIONID = hase.substring(1,hase.length)
+} else {
+  SESSIONID = 'c9c0b3c639f6df89ac38ed44a9da09da169d4e9b'
+}
 
 class API {
 // 获取当天拍卖场列表
-  getToday () {
-    return  `${HTTP}/salesroom/today?session_id=${SESSIONID}`
+  getToday (page) {
+    return  `${HTTP}/salesroom/today/${page}/10?session_id=${SESSIONID}`
   }
 // 获取登录用户信息
   getUsInfo () {
@@ -13,7 +19,7 @@ class API {
 
 // 出价排行榜 
   getBids (roomId, truId, page) {
-    return `${HTTP}/truck/bids/${roomId}/${truId}/${page}/10?session_id=${SESSIONID}`
+    return `${HTTP}/truck/bids/${roomId}/${truId}/${page}/20?session_id=${SESSIONID}`
   }
 
 // 出价 
@@ -39,15 +45,7 @@ class API {
     return `${HTTP}/truck/pictures/${truId}?session_id=${SESSIONID}`
   }
 
-//  获取评论列表 
-  getPostsList () {
-    return `${HTTP}/interface/app/index.php?session_id=${SESSIONID}&action=tao&method=comments&items=10`
-  }
 
-// 发表评论
-  addPosts () {
-    return `${HTTP}/interface/app/index.php?session_id=${SESSIONID}&action=tao&method=reply`
-  }
 
 // 车详情 
   getMsg (roomId, truId) {
@@ -56,6 +54,10 @@ class API {
 // 车配置信息 
   getTruMsg (modelId) {
     return `${HTTP}/truck/configdetail/${modelId}?session_id=${SESSIONID}`
+  }
+// 基本信息
+  getTMsg (truId) {
+    return `${HTTP}/truck/config/${truId}?session_id=${SESSIONID}`
   }
 
 
@@ -83,7 +85,7 @@ class API {
   }
 // 保证金详情 
   myDepMsg (depositeId) {
-    return `${HTTP}/member/depositeview/&{depositeId}?session_id=${SESSIONID}`
+    return `${HTTP}/member/depositeview/${depositeId}?session_id=${SESSIONID}`
   }
 // 创建提醒 
   myRemCrt () {
@@ -105,6 +107,27 @@ class API {
     return `${HTTP}/salesroom/today?session_id=${SESSIONID}`
   }
 
+// 微信配置
+  wxConfig () {
+    return `${HTTP}/wechat/config?session_id=${SESSIONID}`
+  }
+
+/** ------------ ----------- HURL ---------------- */
+
+
+//  获取评论列表 
+  getPostsList () {
+    return `${HURL}/interface/app/index.php?session_id=${SESSIONID}&action=tao&method=comments&`
+  }
+
+// 发表评论
+  addPosts () {
+    return `${HURL}/interface/app/index.php?session_id=${SESSIONID}&action=tao&method=reply`
+  }
+// 上传图片接口
+  upLodImg () {
+    return `${HURL}/interface/app/index.php?session_id=${SESSIONID}&action=AppMisc&operation=upload&type=empty`
+  }
 }
 
 // 实例化后再导出

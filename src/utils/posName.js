@@ -26,9 +26,19 @@ trafficIns: '交强险',
 businessIns: '商业险'
 }
 
-/**
-首页左上角状态
-*/
+
+const Typ = {
+    '1': '车况很好',
+    '2': '保养的不错',
+    '3': '动力强劲',
+    '4': '外观有轻微损伤',
+    '5': '有严重撞伤',
+    '6': '磨损严重'
+}
+
+export const getTYP = (name) => {
+    return Typ[name]
+}
 
 export const getPNA = (name) => {
     return Pna[name]

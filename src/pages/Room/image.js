@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-
 import NavbarPay from '../Navbar/roomfot'
 import { getPNA } from '../../utils/posName'
 import { Tool } from '../../utils/tool'
@@ -25,11 +24,12 @@ export default class TruckList extends Component {
   constructor (props) {
     super(props)
     this.state = {
-        DATA:[],
-        isPay: false,
-        state: 2,
-        deposite: '',
-        roomId: ''
+      isData:false,
+      DATA:[],
+      isPay: false,
+      state: 2,
+      deposite: '',
+      roomId: ''
     }
     this.Pay = this.Pay.bind(this)
   }
@@ -46,6 +46,7 @@ export default class TruckList extends Component {
         return
       }
       this.setState({
+        isData: true,
         DATA: res.data,
         isPay: TRUCK.paid_for_deposite,
         state: TRUCK.status,
@@ -64,7 +65,7 @@ export default class TruckList extends Component {
 
   }
   render () {
-    let { DATA, isPay, state, deposite } = this.state
+    let { DATA, isPay, state, deposite, isData } = this.state
     let footBtn
     switch (state) {
         case '4':
@@ -90,6 +91,7 @@ export default class TruckList extends Component {
           )}
         </ul>
         { footBtn }
+        <div style={{display: !isData ? '':'none'}}><LoadBox /></div>
       </div>
     )
   }

@@ -4,9 +4,9 @@ import API from './api'
 class XHR {
 
 // 获取当天拍卖场列表
-  getToday () {
+  getToday (page) {
     return xhr({ 
-              url: API.getToday(),
+              url: API.getToday(page),
               type: 'get'
           })
     }
@@ -54,10 +54,12 @@ class XHR {
 // 支付页面
 // order_id  string  是 定金支付订单号
   goPay (orderId) {
-    return xhr({ 
-              url: API.goPay(orderId),
-              type: 'get'
-          })
+    // return xhr({ 
+    //           url: API.goPay(orderId),
+    //           type: 'post',
+    //           body:{timestamp: timestamp}
+    //       })
+    return window.location.href = API.goPay(orderId)
   }
 // 拍卖场卡车列表
   getSrom (roomId, page) {
@@ -79,6 +81,7 @@ class XHR {
 // salesroom_id  int 是 拍卖场id
 // truck_id  int 是 拍卖卡车id
 // page  int 否 页数
+// items int 否 每页获取的评论数，默认20
   getPostsList (json) {
     return xhr({ 
               url: API.getPostsList(),
@@ -103,6 +106,19 @@ class XHR {
               body: json
           })
   }
+// 上传图片接口
+// action  string  是 AppMisc 常量
+// operation string  是 upload 常量
+// app int 是 是否是APP上传，取值0或者1
+// appuid  int 是 用户uid
+// filename  string  是 上传文件表单name：Filedata
+  upLodImg (json) {
+    return xhr({ 
+              url: API.upLodImg(),
+              type: 'post',
+              body: json
+          })
+  }
 
 // 车详情 
   getMsg (roomId, truId) {
@@ -115,6 +131,13 @@ class XHR {
   getTruMsg (modelId) {
     return xhr({ 
               url: API.getTruMsg(modelId),
+              type: 'get'
+          })
+  }
+// 基本信息
+  getTMsg (truId) {
+    return xhr({ 
+              url: API.getTMsg(truId),
               type: 'get'
           })
   }
@@ -199,6 +222,15 @@ class XHR {
     return xhr({ 
               url: API.isLogin(),
               type: 'get'
+          })
+  }
+  // 微信配置
+  wxConfig () {
+    let url = window.location.href.substring(0, window.location.href.indexOf('#'))
+    return xhr({ 
+              url: API.wxConfig(),
+              type: 'post',
+              body: {url: url}
           })
   }
   

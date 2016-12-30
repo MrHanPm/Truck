@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 
-import { dataTimeFormatter, dataTimeCountdown, isState} from '../../utils/dateTimeFormatter'
+import { dataTimeFormatter, dataTimeCountdown, isState, typeIsCoun} from '../../utils/dateTimeFormatter'
 import Navbar from '../Navbar/count'
 import NavbarPay from '../Navbar/roomfot'
-import Heads from '../Room/Head'
 import { Link } from 'react-router'
 import { Tool, Alert } from '../../utils/tool'
 import XHR from '../../services/service'
 import { LoadBox } from '../../views/more'
 
+import ImgPic from '../../assets/img/pic.png'
 export default class TruckMsg extends Component {
   static contextTypes = {
     router: React.PropTypes.object.isRequired
@@ -17,6 +17,7 @@ export default class TruckMsg extends Component {
     super(props)
     this.state = {
         isData:false,
+        COMM:[],
         data: {
             salesroom: {},
             truck: {
@@ -34,12 +35,13 @@ export default class TruckMsg extends Component {
     this.OnSale = this.OnSale.bind(this)
     this.goPay = this.goPay.bind(this)
     this.MSG = this.MSG.bind(this)
-    this.setIsPay = this.setIsPay.bind(this)
     this.Pay = this.Pay.bind(this)
     this.selRoom = this.selRoom.bind(this)
+    this.goToCom = this.goToCom.bind(this)
   }
   componentWillMount () {
     let { params: { roomId, truId } } = this.props
+    let json = {}
     XHR.getMsg(roomId, truId)
     .then((db) => {
         if (!db) return
@@ -49,9 +51,21 @@ export default class TruckMsg extends Component {
             isData: true
         })
     })
+    json.salesroom_id = roomId
+    json.truck_id = truId
+    json.page = 1
+    json.items = 1
+    XHR.getPostsList (json)
+    .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        this.setState({
+            COMM: res.data.posts
+        })
+    })
   }
   componentDidMount() {
-
+    salesroom.begin_date
   }
   selRoom (e) {
     let val = e.target.title
@@ -73,6 +87,9 @@ export default class TruckMsg extends Component {
     json.roomId = this.state.data.salesroom.id
     Tool.localItem('TRUCK', JSON.stringify(json))
   }
+  goToCom(){
+    Tool.localItem('TRUCK', this.state.data.truck.fullname)
+  }
   OnSale (nu) {
     if (nu) {
         let newP = this.state.pay + this.state.increase
@@ -86,16 +103,24 @@ export default class TruckMsg extends Component {
         }
     }
   }
-  setIsPay (e) {
-    console.log(e)
-  }
+
   goPay () {
     let { params: { roomId, truId } } = this.props
-    let url = `/pay/${roomId}/${truId}/${this.state.pay}`
-    payService
-    .bidPay( roomId, truId, this.state.pay)
-    .then(msg => {
-      if (msg) return this.context.router.replace(url)
+    let url = `/bidRecord/${roomId}/${truId}`
+    let json = {}
+    json.salesroom_id = roomId
+    json.truck_id = truId
+    json.increase = this.state.pay
+    XHR.potPay(json)
+    .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        if (res.status === 1) {
+            alert(res.data)
+            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+        }
+        this.context.router.replace(url)
     })
   }
   Pay () {
@@ -105,28 +130,32 @@ export default class TruckMsg extends Component {
     this.context.router.replace(url)
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.truckMsg.dataDB) {
-        this.setState({ 
-            data: nextProps.truckMsg.dataDB,
-            increase: parseFloat(nextProps.truckMsg.dataDB.truck.on_sale.increase),
-            pay: parseFloat(nextProps.truckMsg.dataDB.truck.on_sale.init_price)
+    let { params: { roomId, truId } } = nextProps
+    XHR.getMsg(roomId, truId)
+    .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        this.setState({
+            data: res.data,
+            isData: true
         })
-    }
+        this.refs.BoxBt55.scrollTop = 0
+    })
   }
   render () {
     let { params: { roomId, truId } } = this.props
-    // let { data: { salesroom, truck: { on_sale, other_salesroom, other_trucks, pictures, recondition} } } = this.props.truckMsg
-    let {isRoom,isData, data: {salesroom, truck, truck: { pictures, recondition }}} = this.state
+    let {COMM,isRoom,isData, data: {salesroom, truck, truck: { pictures, recondition }}} = this.state
     let Widths = window.screen.width
     let otherSalesroom = this.state.data.truck.other_salesroom
     let otherTrucks = this.state.data.truck.other_trucks
     let footBtn
-    switch (salesroom.status) {
-        case 4:
-            footBtn = <NavbarPay show="false" />
-            break
-        default: 
-           footBtn = <NavbarPay show="true" 
+
+    let TXT = typeIsCoun(salesroom.begin_date * 1000, salesroom.finish_date * 1000)
+
+    if(TXT == '已结束'){
+        footBtn = <NavbarPay show={false} />
+    } else {
+        footBtn = <NavbarPay show={true}
                                 numb={truck.on_sale.deposite}
                                 Pay={this.Pay}/>
     }
@@ -138,7 +167,7 @@ export default class TruckMsg extends Component {
     }
     return (
     <div style={{height: '100%'}}>
-        <div className="BoxBt55">
+        <div className="BoxBt55" ref="BoxBt55">
             <div className="diagram swiper-container clear-float" id="diagram">
                 <div className="swiperBox">
                 <ul className="swiper-wrapper" style={{width: `${Widths * pictures.length}px`}}>
@@ -159,26 +188,26 @@ export default class TruckMsg extends Component {
                 <var className="finish" id={`Feg${salesroom.id}`}
                 style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'finish' ? '' : 'none'}}>已经结束</var>
                 <span className="share"></span>
-                <em className="location">{ truck.address }</em>
+                <em className="location">{ truck.license_city }</em>
                 <em className="enshrine" style={{display: 'none'}}>收藏</em>
             </div>
             <div className="introduce">
-                <p>{truck.fullname}（{salesroom.trucks}辆）</p>
+                <p>{truck.fullname}</p>
                 <div className="car-price">
                     当前价
                     <em> {truck.current_price} </em><i>万元</i>
                     <span><var>{truck.on_sale.bid_persons}</var>人竞拍</span>
                 </div>
-                <div className="time" id={`Cod${salesroom.id}`} onClick={this.setIsPay}>
+                <div className="time" id={`Cod${salesroom.id}`}>
                     {dataTimeCountdown(salesroom.begin_date * 1000, salesroom.finish_date * 1000, salesroom.id)}
                 </div>
-                <a href={`#clock/${roomId}/${truId}`} className="remind">设置提醒</a>
+                <a href={`#clock/${roomId}/${truId}`} className="remind" style={{display: typeIsCoun(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == '已结束'? 'none' : ''}}>设置提醒</a>
             </div>
             <ul className="condition-list">
                 <li>
                     <span>起拍价<i>{truck.on_sale.init_price}万</i></span>
                     <span>评估价<i>{truck.sale_price}万</i></span>
-                    <span>保留价<i>{truck.on_sale.reserve_price}</i></span>
+                    <span>保留价<i>{truck.on_sale.reserve_price > 0 ? '有':'无'}</i></span>
                 </li>
                 <li>
                     <span>加价幅度<i>{truck.on_sale.increase}元</i></span>
@@ -238,12 +267,12 @@ export default class TruckMsg extends Component {
             </div>
 
 
-            <a href="#" className="special">德邦拍卖专场（15）</a>
+            <a href={`#room/${salesroom.id}`} className="special">{salesroom.name}（{salesroom.trucks}）</a>
 
 
             <div className="car-configure">
                 <h3>车辆配置<Link href={`#detail/${truck.model_id}`} className="examine">查看详情</Link></h3>
-                <ul className="configure-list">
+                <ul className="configure-list" style={{display:'none'}}>
                     <li>
                         <span>驱动形式<i>6X4</i></span>
                         <span>排放标准<i>国四</i></span>
@@ -257,43 +286,7 @@ export default class TruckMsg extends Component {
                 </ul>
             </div>
 
-
-            <div className="gauging">
-                <h3>车辆检测报告<a href="#report/11" className="examine">查看详情</a></h3>
-                <div className="post">
-                    <figure><img src="http://usr.im/44x44" alt="" /></figure>
-                    <figcaption>评估师: {truck.recondition_operator}</figcaption>
-                    <em>易卡车高级评估车</em>
-                    <span className="pic b"></span>
-                </div>
-                <i>共105项检测, 100项通过检测</i>
-                <p className="critique">点评：该车整体车况良好。经严格检测，绝非事故车辆。车辆外观无明显色差，车身骨架可见部位无结构性损伤，发动机运转良好无抖动，变速箱工作平稳无异响，内饰干净整洁，各功能按键完好无损坏。</p>
-                <ul className="capability-list">
-                    { recondition.map(db =>
-                    <li>
-                        <a href="#">
-                            {db.position}
-                            <i>3项
-                                <span className="weui-icon-warn"></span>
-                            </i>
-                            <em>5项
-                                <span className="weui-icon-success"></span>
-                            </em>
-                        </a>
-                    </li>
-                    )}
-                </ul>
-                <ul className="deadline-list">
-                    <li>
-                        <span>{dataTimeFormatter(truck.on_licence * 1000, 9)}上牌</span>
-                        <span>{dataTimeFormatter(truck.inspection * 1000, 9)}年检到期</span>
-                    </li>
-                    <li>
-                        <span>{dataTimeFormatter(truck.compulsory * 1000, 9)}交强险到期</span>
-                        <span>{dataTimeFormatter(truck.commercial * 1000, 9)}商业险到期</span>
-                    </li>
-                </ul>
-            </div>
+            
             <div className="place">
                 <h3>看车地点</h3>
             </div>  
@@ -304,25 +297,29 @@ export default class TruckMsg extends Component {
             <div className="situation-modul">
                 <h3>易卡通说<a href={`tel:${truck.custom_service}`} className="consult">咨询车况</a></h3>
                 <div className="situation">
-                    <p>2014年12月上牌准新车，只跑8000公里，单位一手车，车况极品！上海牌照 国四车， 2014年12月上牌准新车，只跑8000公里，单位一手车，车况极品！上海牌照 国四车</p>
+                    <p>{truck.introduction}</p>
                 </div>
             </div>
 
 
             <div className="comments">
-                <h3>网友点评<a href={`/comment/${roomId}/${truId}`} className="examine">查看更多</a></h3>
-                <div className="comments-list">
-                    <span className="good current"></span>
-                    <span className="good"></span>
-                    <span className="good"></span>
-                    <span className="good"></span>
-                    <span className="good"></span>
-                    <figure><img src="http://usr.im/32x32" alt="" /></figure>
-                    <h4 className="caption">打的去唐朝</h4>
-                    <em className="date">2016-08-29</em>
-                </div>
-                <div className="comments-msg">说到底，始终是垃圾，就是某些停留在10年前对国产卡车印象！</div>
-                <a href={`/review/${roomId}/${truId}`} className="know">我看过车，我来点评</a>
+                <h3>网友点评<a href={`#comment/${roomId}/${truId}`} className="examine" onClick={this.goToCom}>查看更多</a></h3>
+                { COMM.map((db,index) =>
+                <Link to={`/comment/${roomId}/${truId}`} onClick={this.goToCom}>
+                    <div className="comments-list" key={index}>
+                        <span className={db.star>='5'?'good':'good current'}></span>
+                        <span className={db.star>='4'?'good':'good current'}></span>
+                        <span className={db.star>='3'?'good':'good current'}></span>
+                        <span className={db.star>='2'?'good':'good current'}></span>
+                        <span className={db.star>='1'?'good':'good current'}></span>
+                        <figure><img src={db.avatar} alt="" /></figure>
+                        <h4 className="caption">{db.author}</h4>
+                        <em className="date">{dataTimeFormatter(db.dateline>0?db.dateline *1000:0,6)}</em>
+                    </div>
+                    <div className="comments-msg">{db.message}</div>
+                </Link>
+                )}
+                <a href={`#review/${roomId}/${truId}`} className="know" onClick={this.goToCom}>我看过车，我来点评</a>
             </div>
 
             <div className="same">
@@ -351,7 +348,28 @@ export default class TruckMsg extends Component {
                     )}
                 </ul>
                 
-                <div style={{display: isRoom ? 'none' : ''}}><Heads DATA={otherSalesroom}/></div>
+                <ul className="auction-pic-list" style={{display: isRoom ? 'none' : ''}}>
+                  { otherSalesroom.map((db,index) =>
+                    <li key={index}>
+                      <figure><img src={`http://imgb.360che.com${db.cover}`} alt="" /></figure>
+                      <Link className="content" to={`/room/${db.id}`}>
+                        <div className="time" id={`Cod${db.id}`}>
+                          {dataTimeCountdown(db.begin_date * 1000, db.finish_date * 1000, db.id)}
+                        </div>
+                        <h2>{ db.name }</h2>
+                        <var>共{ db.trucks }辆车</var>
+                      </Link>
+                      <var className="underway" id={`Und${db.id}`}
+                        style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'underway' ? '' : 'none'}}>正在进行</var>
+                      <var className="begin" 
+                        style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'begin' ? '' : 'none'}}>即将开始</var>
+                      <var className="finish" id={`Feg${db.id}`}
+                        style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'finish' ? '' : 'none'}}>已经结束</var>
+                      <em className="collect" style={{display: 'none'}}>已收藏</em>
+                    </li>
+                  )}
+              </ul>
+
             </div>
         </div>
         {footBtn}
@@ -360,3 +378,42 @@ export default class TruckMsg extends Component {
     )
   }
 }
+
+
+
+// <div className="gauging" display={{display: 'none'}}>
+//                 <h3>车辆检测报告<a href={`#report/${truId}`} className="examine" >查看详情</a></h3>
+//                 <div className="post">
+//                     <figure><img src={ImgPic} alt="" /></figure>
+//                     <figcaption>评估师: {truck.recondition_operator}</figcaption>
+//                     <em>易卡车高级评估车</em>
+//                     <span className={truck.recondition_level}></span>
+//                 </div>
+//                 <i>共{truck.recondition_pass + truck.recondition_notpass}项检测, {truck.recondition_pass}项通过检测</i>
+//                 <p className="critique">点评：{truck.recondition_report}</p>
+//                 <ul className="capability-list">
+//                     { recondition.map((db,index) =>
+//                     <li key={index}>
+//                         <a href="#">
+//                             {db.position}
+//                             <i style={{display: db.notpass > 0 ? '' : 'none'}}>{db.notpass}项
+//                                 <span className="weui-icon-warn"></span>
+//                             </i>
+//                             <em style={{display: db.pass > 0 ? '' : 'none'}}>{db.pass}项
+//                                 <span className="weui-icon-success"></span>
+//                             </em>
+//                         </a>
+//                     </li>
+//                     )}
+//                 </ul>
+//                 <ul className="deadline-list">
+//                     <li>
+//                         <span>{dataTimeFormatter(truck.on_licence * 1000, 9)}上牌</span>
+//                         <span>{dataTimeFormatter(truck.inspection * 1000, 9)}年检到期</span>
+//                     </li>
+//                     <li>
+//                         <span>{dataTimeFormatter(truck.compulsory * 1000, 9)}交强险到期</span>
+//                         <span>{dataTimeFormatter(truck.commercial * 1000, 9)}商业险到期</span>
+//                     </li>
+//                 </ul>
+//             </div>

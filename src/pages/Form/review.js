@@ -1,69 +1,120 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
-import { ErrMsg, Tool } from 'UTIL/errMsg'
-// import store from 'STORE'
-// import { connect } from 'react-redux'
-import roomkService from 'SERVICE/roomService'
-import Navbar from 'COMPONENT/Navbar/comment'
-// import { injectReducer } from 'REDUCER'
-// injectReducer('room', require('REDUCER/room/').default)
+import { Tool, Alert, AllMsgToast } from '../../utils/tool'
+import XHR from '../../services/service'
+import Navbar from '../Navbar/comment'
 
-// @connect(
-//   ({ room }) => ({ room }),
-//   require('ACTION/room').default
-// )
 
 export default class TruckList extends Component {
   constructor (props) {
     super(props)
     this.state = {
-        'salesroom_id': props.roomId,
-        'truck_id': props.truId,
+        'salesroom_id': 0,
+        'truck_id': 0,
          action: 'tao',
          method: 'reply',
          star: 0,
          uid: 0,
          message: '',
          tags: 0,
-         pid: '',
-         attachment: '',
-         'session_id': ''
+         attachment: 'JZ5rnAuWxxMA-oF0c1ILV06uAq9IWbU6cJ8NZK_Xkz9w1p0sDyK6NGoF_UlSreGy',
+         pid: 0,
+
+         isSave: true,
+         imageList: [],  // 选择的图片
+         msgVlue:[], // 提交图片值 attachment
+         TruckNames:''
     }
     this.onSave = this.onSave.bind(this)
     this.taGs = this.taGs.bind(this)
     this.Star = this.Star.bind(this)
     this.inputMessage = this.inputMessage.bind(this)
+    this.chooseImage = this.chooseImage.bind(this)
   }
   componentWillMount () {
-    // console.log(store.getState())
-    // let { params: { truckId } } = this.props
-    // this.props.getImg(truckId)
-    let usD = JSON.parse(Tool.localItem('userData'))
-    // console.log(usD, 'usD')
+    let { params: { roomId, truId, pid } } = this.props
+    let USERINFO = JSON.parse(Tool.localItem('USERINFO'))
+    let Names = Tool.localItem('TRUCK')
     this.setState({
-      uid: usD.uid
+      uid: USERINFO.uid,
+      'salesroom_id': roomId,
+      'truck_id': truId,
+      pid: pid,
+      TruckNames: Names
     })
   }
   componentDidMount() {
-    let sessionId = Tool.localItem('sessionId')
-    this.setState({'session_id': sessionId})
+
+  }
+  chooseImage () {
+    let that = this
+    let imageList = this.state.imageList
+    let counts = 3 - imageList.length
+    if(imageList.length < 4){
+      wx.chooseImage({
+        count: counts,
+        sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+        sourceType: ['album'],
+        success: function (res) {
+          imageList.push(...res.localIds)
+          that.uploadImg(res.localIds)
+          imageList.splice(4,imageList.length - 4)
+          // that.setState({
+          //   imageList:imageList
+          // })
+        }
+      })
+    }
+  }
+  uploadImg (obj) {
+    let that = this
+    let msgVlue = this.state.msgVlue
+    for(let src in obj){
+      wx.uploadImage({
+        localId: obj[src],
+        isShowProgressTips: 1, 
+        success: function (res) {
+            // let txt = DB.data.src.substring(26,DB.data.src.length)
+            // txt = txt.substring(0,txt.length-4)
+            // console.log(DB.data.src,DB.data.src.length)
+          msgVlue.push(res.serverId)
+          that.setState({
+            msgVlue: msgVlue
+          })
+
+          // console.log(res)
+          // console.log(that.data.msgVlue)
+        }
+      })
+    }
   }
   checkForm () {
-    
-    if (this.state.uid === 0) {
-        ErrMsg.to('用户id是空的')
+    if (this.state.message.trim() == '') {
+        Alert.to('内容不能为空')
         return false
+    }
+    if (this.state.star === 0) {
+       Alert.to('必须总体评价')
+       return false
     }
     return true
   }
   onSave () {
-    if (this.checkForm()) {
-        let db = this.state
-        roomkService
-        .addPosts(db)
-        .then(msg => {
-          
-        })
+    if (this.checkForm() && this.state.isSave) {
+      this.setState({isSave: false})
+      let db = this.state
+      // db.attachment = this.state.msgVlue.join('-')
+      XHR.addPosts(db)
+      .then((db) => {
+          if (!db) return
+          let res = JSON.parse(db)
+          if (res.status === 1) {
+            alert(res.data.error_msg)
+            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+          }
+          AllMsgToast.to('发表成功')
+          window.history.back()
+      })
     }
   }
   taGs (e) {
@@ -82,12 +133,12 @@ export default class TruckList extends Component {
     })
   }
   render () {
-    let {message, tags, star} = this.state
+    let {message, tags, star, imageList, TruckNames} = this.state
     return (
     <div style={{height: '100%'}}>
         <div className="BoxBt55">
             <div className="review-head">
-                <p>一汽解放 解放J6P牵引车</p>
+                <p>{TruckNames}</p>
                 <div className="keep">
                     <span title="1" className={tags == '1' ? 'select' : ''} onClick={this.taGs}>车况很好</span>
                     <span title="2" className={tags == '2' ? 'select' : ''} onClick={this.taGs}>保养的不错</span>
@@ -101,18 +152,16 @@ export default class TruckList extends Component {
                 <textarea className="weui-textarea" placeholder="写点什么..." rows="3" value={message} onInput={this.inputMessage}></textarea>
                 <div className="uploader-files">
                     <ul className="uploader">
-                        <li>
-                            <img src="http://usr.im/80x80" alt="" />
+                        {imageList.map( (db,index) => 
+                        <li key={index}>
+                            <img src={db} alt="" />
                             <i className="icon" style={{display: 'none'}}></i>
                             <i className="progress" style={{display: 'none'}}>50%</i>
                         </li>
+                        )}
                     </ul>
                     <div className="add-box">
-                        <span className="add-pic">
-                          <form enctype="multipart/form-data" method="post" name="imgFile">
-                            <input type="file" accept="image/png,image/gif,image/jpeg" />
-                          </form>
-                        </span>
+                        <span className="add-pic" onClick={this.chooseImage}></span>
                     </div>
                 </div>
             </div>
@@ -125,9 +174,14 @@ export default class TruckList extends Component {
                 <span title="1" className={star >= 1 ? 'select' : ''} onClick={this.Star}></span>
             </div>
         </div>
-        <Navbar style={{top: '-60px'}} text="发表评论" 
+        <Navbar text="发表评论" 
                 onSave={this.onSave}/>
     </div>
     )
   }
 }
+
+
+// <form enctype="multipart/form-data" method="post" name="imgFile">
+//   <input type="file" accept="image/png,image/gif,image/jpeg" />
+// </form>

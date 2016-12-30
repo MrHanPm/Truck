@@ -85,18 +85,34 @@ export default class TruckList extends Component {
     return true
   }
   createPay () {
+    let _this = this
     if (this.checkForm()) {
         let json = this.state
         XHR.cotPay(json)
         .then((db) => {
-          if (!db) return
-          let res = JSON.parse(db)
-          if (res.status === 1) { 
-            alert(res.data)
-            window.location.href = 'http://tao-yufabu.360che.com/member'
-            return
-          }
-          XHR.goPay(res.data)
+            if (!db) return
+            let res = JSON.parse(db)
+            let WXCFG = JSON.parse(localStorage.getItem('WXCFG'))
+            if (res.status === 1) {
+                alert(res.data)
+                window.location.href = 'http://tao-yufabu.360che.com/member'
+                return
+            }
+            XHR.goPay(res.data)
+            // XHR.goPay(res.data, WXCFG.timestamp).then((db) => {
+            //     if (!db) return
+            //     let res = JSON.parse(db)
+            //     wx.chooseWXPay({
+            //         timestamp: res.data.pay.timeStamp,
+            //         nonceStr: res.data.pay.nonceStr,
+            //         package: res.data.pay.package,
+            //         signType: res.data.pay.signType,
+            //         paySign: res.data.pay.paySign,
+            //         success: function (res) {
+            //             _this.context.router.replace('/auction')
+            //         }
+            //     })
+            // })
         })
     }
   }

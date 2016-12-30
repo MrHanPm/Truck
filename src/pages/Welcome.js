@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 
 import Navbar from './Navbar/index'
 import XHR from '../services/service'
+import handleScroll from '../utils/handleScroll'
 import { Loading, NoMor, NoData } from '../views/more'
 import { dataTimeCountdown, isState } from '../utils/dateTimeFormatter'
 import { Tool } from '../utils/tool'
@@ -12,22 +13,39 @@ export default class Welcomes extends Component {
     super(props)
     this.state = {
       isData: false,
-      isLoading: true,
+      isLoading: true, // 加载动画
+      iaLod: false,  // 是否加载
+      nowPage: 1,
+
       DATA:[]
     }
-    
+    this.handleScroll = handleScroll.bind(this)
   }
   componentWillMount () {
-    let hase = window.location.pathname
-    // console.log(hase,'hase',22222222)
-    let sessionId
-    if (hase.length > 6) {
-      sessionId = hase.substring(1,hase.length)
-    } else {
-      sessionId = '84336cbcb894abee6c46e85d62fe18596b0eaa55'
-    }
-    Tool.localItem('SESSIONID', sessionId)
-    
+    XHR.wxConfig()
+    .then((db) => {
+      if (!db) return
+      let res = JSON.parse(db)
+      Tool.localItem('WXCFG', JSON.stringify(res.data))
+      // wx.config({
+      //   debug:true,
+      //   appId: res.data.appId,
+      //   timestamp: res.data.timestamp,
+      //   nonceStr: res.data.noncestr,
+      //   signature: res.data.signature,
+      //   jsApiList: [
+      //       'hideOptionMenu',
+      //       'showOptionMenu',
+      //       'closeWindow',
+      //       'onMenuShareAppMessage',
+      //       'uploadImage',
+      //       'chooseImage',
+      //       'chooseWXPay'
+      //   ]
+      // })
+    })
+
+    let nowPage = 1
     XHR.getUsInfo()
       .then((db) => {
         if (!db) return
@@ -36,19 +54,51 @@ export default class Welcomes extends Component {
         Tool.localItem('USERINFO', JSON.stringify(res.data))
       })
 
-    XHR.getToday()
+    XHR.getToday(1)
       .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
+        nowPage++
         if(res.data.length === 0){
           this.setState({isData: true})
         }else{
           this.setState({
             DATA: res.data,
-            isLoading: false
+            nowPage: nowPage,
+            iaLod: res.data.length < 10 ? false : true,
+            isLoading: res.data.length < 10 ? false : true
           })
         }
       })
+  }
+  upDATA () {
+    let { nowPage, iaLod, isData, isLoading, DATA } = this.state
+    // console.log(roomId, nowPage, iaLod)
+    if(iaLod) {
+      this.setState({iaLod:false})
+      XHR.getToday(nowPage)
+      .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        nowPage++
+        DATA.push(...res.data)
+        if(res.data.length < 10) {
+          this.setState({
+            DATA: DATA,
+            isLoading: false
+          })
+        }else{
+          this.setState({
+            DATA: DATA,
+            nowPage: nowPage,
+            iaLod: true
+          })
+        }
+      })
+    }
+  }
+  componentWillUnmount () {
+    
   }
   render () {
     let footer = null
@@ -56,11 +106,11 @@ export default class Welcomes extends Component {
     if(isData){
         footer = <NoData />
     }else{
-        footer = isLoading ? <Loading DATA={true}/> : <NoMor />
+        footer = isLoading ? <Loading DATA={DATA.length>0?false:true}/> : <NoMor />
     }
     return (
       <div style={{height: '100%'}}>
-        <div className="boxPb" data-pb="50" onScroll={this.handleScroll}>
+        <div className="boxPb" data-pb="0" onScroll={this.handleScroll}>
           <ul className="auction-pic-list">
           { DATA.map((db, index) =>
             <li key={index}>

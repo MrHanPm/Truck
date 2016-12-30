@@ -138,10 +138,11 @@
 .gauging .post figure img{width:44px;height:44px;border-radius:50%;}
 .gauging .post figcaption{font-size:16px;color:#333;}
 .gauging .post em{font-size:14px;color:#666;}
-.gauging .post .pic{position:absolute;top:15px;right:15px;width:103px;height:103px;background:url(../img/good_a.png) no-repeat;background-size:100%;}
-.gauging .post .b{background-image:url(../img/good_b.png);}
-.gauging .post .c{background-image:url(../img/good_c.png);}
-.gauging .post .d{background-image:url(../img/good_d.png);}
+.gauging .post span{position:absolute;top:15px;right:15px;width:103px;height:103px;background:url(../img/good_a.png) no-repeat;background-size:100%;}
+.gauging .post .A{background-image:url(../img/good_a.png);}
+.gauging .post .B{background-image:url(../img/good_b.png);}
+.gauging .post .C{background-image:url(../img/good_c.png);}
+.gauging .post .D{background-image:url(../img/good_d.png);}
 .gauging i{display:block;font-size:16px;color:#f85200;padding:10px 0 20px 15px;}
 .gauging .critique{line-height:22px;font-size:14px;color:#333;padding:0 15px 15px;border-bottom:1px solid #e5e5e5;}
 
@@ -275,7 +276,7 @@ header .reference span i{font-size:16px;color:#f85200;font-weight:bold;}
 .bail-list li figure,.remind-list li figure{position:absolute;top:15px;left:15px;}
 .bail-list li figure img,.remind-list li figure img{width:80px;height:80px;border:1px solid #e5e5e5;}
 .bail-list li figcaption,.remind-list li figcaption{line-height:16px;font-size:16px;color:#333;}
-.bail-list li > span{display:block;line-height:12px;font-size:12px;color:#999;margin:10px 0 26px 0;}
+.bail-list .span{display:block;line-height:12px;font-size:12px;color:#999;margin:10px 0 26px 0;}
 .bail-list li .bail{overflow:hidden;}
 .bail-list li .bail > span{line-height:16px;font-size:16px;color:#999;}
 .bail-list li .bail em{line-height:16px;font-size:18px;color:#f85200;}
@@ -287,10 +288,10 @@ header .reference span i{font-size:16px;color:#f85200;font-weight:bold;}
 .remind-list .underway,.remind-list .begin,.remind-list .finish{position:absolute;top:24px;left:15px;}
 .remind-list{background:#fff;}
 .remind-list li:last-child{margin-bottom:10px;border:none;}
-.remind-list li > span{display:block;line-height:12px;font-size:12px;color:#999;margin:10px 0;}
-.remind-list li > em{display:block;line-height:12px;font-size:12px;color:#333;}
-.remind-list li > i{float:right;line-height:12px;font-size:12px;color:#666;margin-top:8px;}
-.remind-list li > i:before{font-family: 'second';content:"\5220";font-size:12px;margin-right:4px;color:#666;}
+.remind-list li span{display:block;line-height:12px;font-size:12px;color:#999;margin:10px 0;}
+.remind-list li em{display:block;line-height:12px;font-size:12px;color:#333;}
+.remind-list li i{float:right;line-height:12px;font-size:12px;color:#666;margin-top:8px;}
+.remind-list li i:before{font-family: 'second';content:"\5220";font-size:12px;margin-right:4px;color:#666;}
 
 /*车辆检测报告*/
 .check{position:relative;background:#fff;padding:15px 15px 15px 85px;}
@@ -423,7 +424,7 @@ footer p{font-size:12px;color:#999;text-align:center;margin-top:20px;}
 .posts-list footer .time{line-height:12px;}
 .posts-list footer .reply{float:right;line-height:12px;}
 .posts-list footer .reply:before{font-family: 'second';content:"\56de";margin-right:4px;font-size:12px;}
-.posts-list .comment-mess{min-height:62px;background:#f5f5f5;border-radius:3px;margin-top:10px;}
+.posts-list .comment-mess{height:auto;background:#f5f5f5;border-radius:3px;margin-top:10px;}
 
 /*评论*/
 .review-head{background:#fff;padding:15px 15px 10px;}
@@ -436,7 +437,7 @@ footer p{font-size:12px;color:#999;text-align:center;margin-top:20px;}
 .write textarea::-webkit-input-placeholder{color:#999;font-size:14px;}
 .uploader-files{overflow:hidden;}
 .uploader li{position:relative;float:left;width:60px;height:60px;margin-right:10px;}
-.uploader li:before{position:absolute;top:0;right:0;left:0;bottom:0;content:"";background:rgba(0,0,0,.5);}
+/*.uploader li:before{position:absolute;top:0;right:0;left:0;bottom:0;content:"";background:rgba(0,0,0,.5);}*/
 .uploader li .icon{position:absolute;top:50%;left:50%;color:#f43530;margin:-16px 0 0 -12px;}
 .uploader li .icon:before{font-family: 'second';content:"\4f20";font-size:23px;}
 .uploader li .progress{position:absolute;top:50%;left:50%;color:#fff;font-size:16px;margin:-12px 0 0 -14px;}

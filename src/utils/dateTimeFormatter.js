@@ -58,6 +58,19 @@ export const dataTimeFormatter = (time, type) => {
 /**
 *首页中间状态*
 */
+export const typeIsCoun = (Stime, Etime) => {
+  let Now = Math.round(new Date().getTime())
+  let Nt = dataTimeFormatter(Now)
+  // 真实
+  let St = dataTimeFormatter(Stime)
+  let Et = dataTimeFormatter(Etime)
+
+  if (Nt > Et) {
+    return '已结束'
+  }else{
+    return '在进行'
+  }
+}
 
 export const dataTimeCountdown = (Stime, Etime, id) => {
   let Now = Math.round(new Date().getTime())
@@ -88,17 +101,21 @@ UI计时状态
 */
 const CountdownDiv = (Etime, id) => {
   let dov = 'Cod' + id
-  setTimeout(function() {
-    BackCountdown(Etime, (msg) => {
-      document.getElementById(dov).innerHTML = msg
-      if (msg == '已结束') {
-        let underway = 'Und' + id
-        let finish = 'Feg' + id
-        document.getElementById(underway).style.display = 'none'
-        document.getElementById(finish).style.display = 'block'
-      }
-    })
-  }, 100)
+  
+    setTimeout(function() {
+      BackCountdown(Etime, (msg) => {
+        try{
+        document.getElementById(dov).innerHTML = msg
+        if (msg == '已结束') {
+          let underway = 'Und' + id
+          let finish = 'Feg' + id
+          document.getElementById(underway).style.display = 'none'
+          document.getElementById(finish).style.display = 'block'
+        }
+        }catch(err){}
+      })
+    }, 100)
+  
 }
 /**
 倒计时

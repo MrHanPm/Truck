@@ -1,33 +1,39 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
 import { dataTimeFormatter} from '../utils/dateTimeFormatter'
 import { Tool } from '../utils/tool'
-
+import XHR from '../services/service'
+import { LoadBox } from '../views/more'
 
 export default class TruckList extends Component {
     constructor (props) {
         super(props)
         this.state = {
+            isData: true,
             MDB: {}
         }
     }
-  componentWillMount () {
-    let sessionId = Tool.localItem('sessionId')
-    let { params: { bidId } } = this.props
-    
-  }
-  componentDidMount() {
-
-  }
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-        MDB: nextProps.myMsg.winsMsg
-    })
-  }
+    componentWillMount () {
+        let { params: { bidId } } = this.props
+        XHR.myWinMsg(bidId)
+        .then((db) => {
+          if (!db) return
+          let res = JSON.parse(db)
+          if (res.status === 1) {
+            alert(res.data)
+            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+          }
+          this.setState({MDB: res.data,isData: false})
+        })
+    }
   render () {
-    let { MDB } = this.state
+    let { isData,MDB } = this.state
+    let footer = null
     let Lname = '无'
-     switch (MDB.order_status) {
+    if(isData){
+        footer = <LoadBox />
+    }
+    switch (MDB.order_status) {
         case '1' :
             Lname = '未处理'
             break
@@ -56,11 +62,11 @@ export default class TruckList extends Component {
             </li>
             <li>
                 保证金金额
-                <var>{MDB.init_price}(交易完退还)</var>
+                <var>{MDB.deposite}(交易完退还)</var>
             </li>
             <li>
                 获拍时间
-                <var>{dataTimeFormatter(MDB.create_at * 1000, 7)}</var>
+                <var>{MDB.create_at.length>6?dataTimeFormatter(MDB.create_at * 1000, 7):'- -'}</var>
             </li>
         </ul>
         <div className="business">
@@ -79,6 +85,7 @@ export default class TruckList extends Component {
             </li>
         </ul>
       </div>
+      {footer}
       <span className="go-back" onClick ={() => {window.history.back()}}>返回</span>
       </div>
     )

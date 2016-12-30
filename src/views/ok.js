@@ -8,8 +8,8 @@ export default class About extends Component {
           <i className="weui-icon-success weui-icon_msg"></i>
         </span>
         <p>支付成功</p>
-        <a href="/index" className="continue">继续拍卖</a>
-        <a href="/auction" className="go-home">回到主页</a>
+        <a href="#/auction" className="continue">继续拍卖</a>
+        <a href="#/" className="go-home">回到主页</a>
         <em>咨询电话</em>
         <a href="tel:400-0000-0000" className="phone">400-0000-0000</a>
       </div>

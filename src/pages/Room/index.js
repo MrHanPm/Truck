@@ -4,7 +4,7 @@ import { Tool } from '../../utils/tool'
 import Heads from './Head'
 import handleScroll from '../../utils/handleScroll'
 import { Loading, NoMor, NoData, LoadBox} from '../../views/more'
-import { dataTimeCountdown } from '../../utils/dateTimeFormatter'
+import { dataTimeCountdown,typeIsCoun } from '../../utils/dateTimeFormatter'
 import XHR from '../../services/service'
 
 export default class TruckList extends Component {
@@ -84,13 +84,13 @@ export default class TruckList extends Component {
         footer = isLoading ? <Loading DATA={DATA.length>0?false:true}/> : <NoMor />
     }
     return (
-      <div className="TrLiBox" data-pb="1" onScroll={this.handleScroll}>
+      <div className="TrLiBox" data-pb="6" onScroll={this.handleScroll}>
         <Heads DATA={trucks}/>
         <div className="set-up">
           <div className="time" id={`Cod${trucks.id}`}>
             {dataTimeCountdown(trucks.begin_date * 1000, trucks.finish_date * 1000, trucks.id)}
           </div>
-          <a href={`#clock/${roomId}`} className="remind">设置提醒</a>
+          <a href={`#clock/${roomId}`} className="remind"  style={{display: typeIsCoun(trucks.begin_date * 1000, trucks.finish_date * 1000) == '已结束'? 'none' : ''}}>设置提醒</a>
         </div>
         <ul className="car-list">
         { DATA.map((db, index) =>

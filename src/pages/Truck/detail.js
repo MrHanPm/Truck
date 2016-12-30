@@ -1,30 +1,57 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
 import { Tool } from '../../utils/tool'
 import XHR from '../../services/service'
-import Navbar from '../Navbar/roomfot'
+import { LoadBox} from '../../views/more'
+
+class Navbar extends Component {
+  render () {
+    return (
+      <div className="comment">
+        <span className="return" onClick ={() => {window.history.back()}}></span>
+        <em className="comment-on" onClick ={() => {window.history.back()}}>去出价</em>
+      </div>
+    )
+  }
+}
 
 export default class TruckList extends Component {
   constructor (props) {
     super(props)
     this.state = {
+        isData:false,
         DB: []
     }
   }
   componentWillMount () {
-    
     let { params: { modelId } } = this.props
-    // this.props.modeMsg(sessionId, modelId)
+    XHR.getTruMsg(modelId)
+    .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        let DATA = res.data
+        if (res.status === 1) { 
+            alert(res.data.error_msg)
+            window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+        }
+        // DATA.map((az, inx) => {
+        //     if(az.is_show === 0){
+        //         DATA.splice(inx,1)
+        //     }
+        // })
+        this.setState({
+            isData: true,
+            DB: DATA
+        })
+    })
   }
-  componentDidMount() {
 
-  }
   render () {
-    let { DB } = this.state
+    let { DB, isData } = this.state
     return (
     <div style={{height: '100%'}}>
         <div className="BoxBt55">
-            <header>
+            <header style={{display: 'none'}}>
                 <figure><img src="http://usr.im/80x80" alt="" /></figure>
                 <figcaption>一汽解放 解放J6P牵引车</figcaption>
                 <div className="reference">
@@ -35,14 +62,14 @@ export default class TruckList extends Component {
             <div className="configure">
                 <h3>基本配置</h3>
                 <ul>
-                    {DB.map(db =>
-                    <li>
-                        <span>{db.aname}<em>{db.avalue}{db.unit}</em></span>
+                    {DB.map((db,index) =>
+                    <li key={index}>
+                        <span>{db.aname}<em>{db.avalue ? db.avalue : '-' } {db.unit? db.unit : '-'}</em></span>
                     </li>
                     )}
                 </ul>
             </div>
-            <div className="engine">
+            <div className="engine" style={{display: 'none'}}>
                 <h3>发动机</h3>
                 <ul>
                     <li>
@@ -68,6 +95,7 @@ export default class TruckList extends Component {
             </div>
         </div>
         <Navbar style={{top: '-50px'}}/>
+        <div style={{display: !isData ? '':'none'}}><LoadBox /></div>
     </div>
     )
   }

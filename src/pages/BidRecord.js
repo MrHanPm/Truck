@@ -1,72 +1,109 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
-import { dataTimeFormatter} from 'UTIL/dateTimeFormatter'
-import { Tool } from 'UTIL/errMsg'
-import { connect } from 'react-redux'
-import { injectReducer } from 'REDUCER'
-injectReducer('pays', require('REDUCER/pay/').default)
-@connect(
-  ({ pays }) => ({ pays }),
-  require('ACTION/pay/').default
-)
+import { dataTimeFormatter } from '../utils/dateTimeFormatter'
+import { Tool, Alert } from '../utils/tool'
+import XHR from '../services/service'
+import handleScroll from '../utils/handleScroll'
+import { Loading, NoMor, NoData, LoadBox} from '../views/more'
 
 export default class BidREC extends Component {
   constructor (props) {
     super(props)
     this.state = {
-        BID: []
+      isData: false,
+      isLoading: true, // 加载动画
+      iaLod: false,  // 是否加载
+      nowPage: 1,
+
+      BID: []
     }
+    this.handleScroll = handleScroll.bind(this)
   }
   componentWillMount () {
-    let sessionId = Tool.localItem('sessionId')
     let { params: { roomId, truId } } = this.props
-    this.props.getBid(sessionId, roomId, truId, 1, 10)
+    let USERINFO = JSON.parse(Tool.localItem('USERINFO'))
+    let nowPage = this.state.nowPage
+    XHR.getBids(roomId, truId,1)
+    .then((db) => {
+          if (!db) return
+          let res = JSON.parse(db)
+          nowPage++
+          if (res.status === 1) {
+            alert(res.data.error_msg)
+            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            return
+          }
+          if(res.data.length === 0){
+            this.setState({
+              isData: true
+            })
+          }else{
+            this.setState({
+              UID: USERINFO.uid,
+              BID: res.data,
+              nowPage: nowPage,
+              iaLod: res.data.length < 20 ? false : true,
+              isLoading: res.data.length < 20 ? false : true
+            })
+          }
+      })
   }
-  componentDidMount() {
 
-  }
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.pays.bidRecord.length > 0) {
-        this.setState({
-            BID: nextProps.pays.bidRecord
-        })
+  upDATA () {
+    let { params: { roomId, truId } } = this.props
+    let { nowPage, iaLod, isData, isLoading, BID } = this.state
+    if(iaLod) {
+      this.setState({iaLod:false})
+      XHR.getBids(roomId, truId,nowPage)
+      .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        nowPage++
+        BID.push(...res.data)
+        if(res.data.length < 20) {
+          this.setState({
+            BID: BID,
+            isLoading: false
+          })
+        }else{
+          this.setState({
+            BID: BID,
+            nowPage: nowPage,
+            iaLod: true
+          })
+        }
+      })
     }
   }
+
   render () {
-    let { BID } = this.state
+    let footer = null
+    let { BID, UID, isData, isLoading} = this.state
+    if(isData){
+        footer = <NoData />
+    }else{
+        footer = isLoading ? <Loading DATA={BID.length>0?false:true}/> : <NoMor />
+    }
     return (
-      <div className="container">
+      <div style={{height:'100%'}}>
         <div className="head Ding">
             <span>竞拍人</span>
             <span>出价金额</span>
             <span>时间</span>
         </div>
-        <ul className="bid-list DinHead">
-            <li>
-                <span><img src="http://usr.im/50x50" alt="" /></span>
-                <span>30.12万</span>
-                <span>08-12 08:40</span>
-                <em className="ahead">领先</em>
-            </li>
-            <li>
-                <span>
-                    <img src="http://usr.im/40x40" alt="" />
-                    <i className="myself">我</i>
-                </span>
-                <span>30.12万</span>
-                <span>08-12 08:40</span>
-                <em className="eliminated">出局</em>
-            </li>
-            { BID.map(db =>
-            <li>
+        <ul className="bid-list DinHead" data-pb="50" onScroll={this.handleScroll}>
+            { BID.map((db,index) =>
+            <li key={index}>
                 <span><img src={db.member.avatar} alt="" /></span>
+                <i className="myself" style={{display: db.uid == UID ? '':'none'}}>我</i>
                 <span>{db.amount}万</span>
                 <span>{dataTimeFormatter(db.create_at * 1000, 10)}</span>
                 <em className="eliminated" style={{display: db.out ? 'none' : ''}}>出局</em>
                 <em className="ahead" style={{display: db.out ? '' : 'none'}}>领先</em>
             </li>
             )}
+            <li style={{background:'none'}}>{ footer }</li>
         </ul>
+        <div style={{display: BID.length===0 && !isData ? '':'none'}}><LoadBox /></div>
         <span className="go-back" onClick ={() => {window.history.back()}}>返回</span>
       </div>
     )
