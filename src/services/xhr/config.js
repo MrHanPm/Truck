@@ -54,4 +54,6 @@ USERINFO    {"uid":"487992","nickname":"arui128","email":"","mobile":"1352034499
 URL   
 
 TRUCK
+
+ ALARMCLOCK  // 闹钟定时器
 */

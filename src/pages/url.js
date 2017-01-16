@@ -14,7 +14,7 @@ export default class Url extends Component {
         <li><a href="#detail/11">基本配置</a></li>
         <li><a href="#auction">我的竞拍</a></li>
         <li><a href="#bidRecord">竞拍排行榜</a></li>
-        <li><a href="#marginDetails">保证金页</a></li>
+        <li><a href="#margindetails">保证金页</a></li>
         <li><a href="#margin">订单状态</a></li>
         <li><a href="#comment">评价列表</a></li>
         <li><a href="#clock">时间提醒</a></li>

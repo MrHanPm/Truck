@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import NavbarPay from '../Navbar/roomfot'
+import { typeIsCoun} from '../../utils/dateTimeFormatter'
 import { getPNA } from '../../utils/posName'
 import { Tool } from '../../utils/tool'
 import { LoadBox} from '../../views/more'
@@ -29,7 +30,9 @@ export default class TruckList extends Component {
       isPay: false,
       state: 2,
       deposite: '',
-      roomId: ''
+      roomId: '',
+      beginDate:'',
+      finishDate:''
     }
     this.Pay = this.Pay.bind(this)
   }
@@ -41,8 +44,9 @@ export default class TruckList extends Component {
       if (!db) return
       let res = JSON.parse(db)
       if (res.status === 1) { 
-        alert(res.data)
-        window.location.href = 'http://tao-yufabu.360che.com/member'
+        alert(res.data.error_msg)
+        let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
         return
       }
       this.setState({
@@ -51,7 +55,9 @@ export default class TruckList extends Component {
         isPay: TRUCK.paid_for_deposite,
         state: TRUCK.status,
         deposite: TRUCK.deposite,
-        roomId: TRUCK.roomId
+        roomId: TRUCK.roomId,
+        beginDate: TRUCK.begin_date,
+        finishDate: TRUCK.finish_date
       })
     })
   }
@@ -65,14 +71,12 @@ export default class TruckList extends Component {
 
   }
   render () {
-    let { DATA, isPay, state, deposite, isData } = this.state
+    let { DATA, isPay, state, deposite, isData,beginDate,finishDate } = this.state
     let footBtn
-    switch (state) {
-        case '4':
-            footBtn = <NavbarPay show="false" />
-            break
-        default: 
-           footBtn = <NavbarPay show="true" 
+    if(state == '4' || state == '5'){
+        footBtn = <NavbarPay show={false} />
+    } else {
+           footBtn = <NavbarPay show={true}
                                 numb={deposite}
                                 Pay={this.Pay}/>
     }

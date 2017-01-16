@@ -28,18 +28,18 @@ export default class Heads extends Component {
             <figure><img src={`http://imgb.360che.com${db.cover}`} alt="" /></figure>
             <div className="content">
               <div className="time">
-                结束时间：
-                {dataTimeFormatter(db.finish_date * 1000)}
+                开始时间：
+                {dataTimeFormatter(db.begin_date * 1000)}
               </div>
               <h2>{ db.name }</h2>
-              <var>共{ db.trucks }辆车</var>
+              <var><i>共{ db.trucks }辆车</i></var>
             </div>
             <var className="underway" id={`Und${db.id}`}
-                style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'underway' ? '' : 'none'}}>正在进行</var>
+                style={{display: isState(db.status) == 'underway' ? '' : 'none'}}>正在进行</var>
               <var className="begin" 
-                style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'begin' ? '' : 'none'}}>即将开始</var>
+                style={{display: isState(db.status) == 'begin' ? '' : 'none'}}>即将开始</var>
               <var className="finish" id={`Feg${db.id}`}
-                style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'finish' ? '' : 'none'}}>已经结束</var>
+                style={{display: isState(db.status) == 'finish' ? '' : 'none'}}>已经结束</var>
             <em className="collect" style={{display: 'none'}}>已收藏</em>
           </li>
       </ul>

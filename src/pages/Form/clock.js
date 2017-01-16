@@ -4,6 +4,7 @@ import handleChange from '../../utils/handleChange'
 import { Alert, Tool, AllMsgToast } from '../../utils/tool'
 import Navbar from '../Navbar/yesNo'
 import XHR from '../../services/service'
+import { dataTimeFormatter } from '../../utils/dateTimeFormatter'
 
 export default class TruckList extends Component {
   constructor (props) {
@@ -14,7 +15,8 @@ export default class TruckList extends Component {
          mode: 'sms',
          mobile: '',
          start_difference: 0,
-         end_difference: 0
+         end_difference: 0,
+         ALARMCLOCK: {}
     }
     this.crtClick = this.crtClick.bind(this)
     this.handleChange = handleChange.bind(this)
@@ -22,7 +24,11 @@ export default class TruckList extends Component {
   }
   componentWillMount () {
     let usfo = JSON.parse(Tool.localItem('USERINFO'))
-    this.setState({mobile: usfo.mobile})
+    let ALARMCLOCK = JSON.parse(Tool.localItem('ALARMCLOCK'))
+    this.setState({
+        mobile: usfo.mobile,
+        ALARMCLOCK: ALARMCLOCK
+    })
   }
   componentDidMount() {
 
@@ -47,26 +53,53 @@ export default class TruckList extends Component {
   }
   radios (e) {
     let nub = e.target.value
-    // console.log(e.target.checked)
+    let { ALARMCLOCK } = this.state
+    // console.log(this.state.ALARMCLOCK)
+    let Nows = new Date()
+    Nows.setMonth(Nows.getMonth()-5)
+    let Eows = new Date()
+    Eows.setMonth(Eows.getMonth()-30)
+    let Eow = Eows
+    let Nt = dataTimeFormatter(Nows)
+    let NEt = dataTimeFormatter(Eow)
+    let St = dataTimeFormatter(ALARMCLOCK.ST)
+    let Et = dataTimeFormatter(ALARMCLOCK.Et)
+
     if (e.target.value > 300) {
-        if(e.target.checked){
-            this.setState({
-                end_difference: e.target.value
-            })
+         if( Nt < St ) {
+            this.refs.fivs.disabled = false
+            if(e.target.checked){
+                this.setState({
+                    end_difference: e.target.value
+                })
+            } else {
+                this.setState({
+                    end_difference: 0
+                })
+            }
         } else {
-            this.setState({
-                end_difference: 0
-            })
+            this.refs.fivs.checked = false
+            this.refs.fivs.disabled = true
+            Alert.to('开拍前已经超过5分钟')
+            return false
         }
     } else {
-        if(e.target.checked){
-            this.setState({
-                start_difference: e.target.value
-            })
+        if( Et > NEt ) {
+             this.refs.overs.disabled = false
+            if(e.target.checked){
+                this.setState({
+                    start_difference: e.target.value
+                })
+            } else {
+                this.setState({
+                    start_difference: 0
+                })
+            }
         } else {
-            this.setState({
-                start_difference: 0
-            })
+            this.refs.overs.checked = false
+            this.refs.overs.disabled = true
+            Alert.to('结束前已经超过30分钟')
+            return false
         }
     }
   }
@@ -79,8 +112,9 @@ export default class TruckList extends Component {
             if (!db) return
             let res = JSON.parse(db)
             if (res.status === 1) {
-                alert('登录超时～')
-                window.location.href = 'http://tao-yufabu.360che.com/member'
+                alert(res.data.error_msg)
+                let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
                 return
             }
             AllMsgToast.to('设置成功')
@@ -98,14 +132,14 @@ export default class TruckList extends Component {
                     <li>
                         <label For="s11">
                             <i>开拍前5分钟提醒</i>
-                            <input type="checkbox" className="weui-check" id="s11" value="300" onChange={this.radios} />
+                            <input type="checkbox" className="weui-check" id="s11" value="300" onChange={this.radios} ref="fivs"/>
                             <span className="choice"></span>
                         </label>
                     </li>
                     <li>
                         <label For="s12">
                             <i>结束前30分钟提醒</i>
-                            <input type="checkbox" className="weui-check" id="s12" value="1800" onChange={this.radios} />
+                            <input type="checkbox" className="weui-check" id="s12" value="1800" onChange={this.radios} ref="overs" />
                             <span className="choice"></span>
                         </label>
                     </li>

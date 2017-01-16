@@ -44,7 +44,7 @@ ReactDOM.render((
         <Route path="report/:truId" component={TruckReport}/>
         <Route path="detail/:modelId" component={TruckDetail}/>
         <Route path="auction" component={Auction}/>
-        <Route path="marginDetails/:depositeId" component={MarginDetails}/>
+        <Route path="margindetails/:depositeId" component={MarginDetails}/>
         <Route path="margin/:bidId" component={Margin}/>
         <Route path="bidRecord/:roomId/:truId" component={BidRecord}/>
         
@@ -74,7 +74,7 @@ ReactDOM.render((
   ├ 
   ├ /auction                      // 我的竞拍
   ├ /bidRecord                    // 竞拍排行榜
-  ├ /marginDetails                // 保证金页
+  ├ /margindetails                // 保证金页
   ├ /margin                       // 订单状态
   ├ /comment                      // 评价列表
   ├ /clock                        // 时间提醒

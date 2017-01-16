@@ -88,9 +88,9 @@ export default class TruckList extends Component {
         <Heads DATA={trucks}/>
         <div className="set-up">
           <div className="time" id={`Cod${trucks.id}`}>
-            {dataTimeCountdown(trucks.begin_date * 1000, trucks.finish_date * 1000, trucks.id)}
+            {dataTimeCountdown(trucks.begin_date * 1000, trucks.finish_date * 1000, trucks.id,  trucks.status)}
           </div>
-          <a href={`#clock/${roomId}`} className="remind"  style={{display: typeIsCoun(trucks.begin_date * 1000, trucks.finish_date * 1000) == '已结束'? 'none' : ''}}>设置提醒</a>
+          <a href={`#clock/${roomId}`} className="remind"  style={{display: typeIsCoun(trucks.begin_date * 1000, trucks.finish_date * 1000, trucks.status ) == '已结束'? 'none' : ''}}>设置提醒</a>
         </div>
         <ul className="car-list">
         { DATA.map((db, index) =>

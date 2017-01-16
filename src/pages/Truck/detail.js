@@ -31,7 +31,8 @@ export default class TruckList extends Component {
         let DATA = res.data
         if (res.status === 1) { 
             alert(res.data.error_msg)
-            window.location.href = 'http://tao-yufabu.360che.com/member'
+            let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
             return
         }
         // DATA.map((az, inx) => {

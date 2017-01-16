@@ -2,13 +2,17 @@ import React, { Component } from 'react'
 
 import { dataTimeFormatter, dataTimeCountdown, isState, typeIsCoun} from '../../utils/dateTimeFormatter'
 import Navbar from '../Navbar/count'
+import Noavbarpl from '../Navbar/nocount'
 import NavbarPay from '../Navbar/roomfot'
+import NavbarRF from '../Navbar/roomfs'
 import { Link } from 'react-router'
 import { Tool, Alert } from '../../utils/tool'
 import XHR from '../../services/service'
 import { LoadBox } from '../../views/more'
 
 import ImgPic from '../../assets/img/pic.png'
+let footBtn,otherSalesroom,otherTrucks
+
 export default class TruckMsg extends Component {
   static contextTypes = {
     router: React.PropTypes.object.isRequired
@@ -25,17 +29,18 @@ export default class TruckMsg extends Component {
                 recondition: [],
                 'on_sale': {},
                 'other_salesroom': [],
-                'other_trucks': []
+                'other_trucks': [],
+                'config_base': []
             }
         },
-        increase: 0,
-        pay: 0,
-        isRoom: true
+        showTimes: 0,
+        increase: 0,  // 加价幅度
+        pay: 0,  // 起拍价
+        isRoom: true  // 切换菜单
     }
     this.OnSale = this.OnSale.bind(this)
     this.goPay = this.goPay.bind(this)
     this.MSG = this.MSG.bind(this)
-    this.Pay = this.Pay.bind(this)
     this.selRoom = this.selRoom.bind(this)
     this.goToCom = this.goToCom.bind(this)
   }
@@ -48,6 +53,8 @@ export default class TruckMsg extends Component {
         let res = JSON.parse(db)
         this.setState({
             data: res.data,
+            increase: res.data.truck.on_sale.increase,
+            pay: Math.round(res.data.truck.on_sale.increase),
             isData: true
         })
     })
@@ -65,8 +72,9 @@ export default class TruckMsg extends Component {
     })
   }
   componentDidMount() {
-    salesroom.begin_date
+    
   }
+  
   selRoom (e) {
     let val = e.target.title
     if (val == 1) {
@@ -85,6 +93,8 @@ export default class TruckMsg extends Component {
     json.status = this.state.data.truck.status
     json.deposite = this.state.data.truck.on_sale.deposite
     json.roomId = this.state.data.salesroom.id
+    json.begin_date = this.state.data.salesroom.begin_date
+    json.finish_date = this.state.data.salesroom.finish_date
     Tool.localItem('TRUCK', JSON.stringify(json))
   }
   goToCom(){
@@ -92,12 +102,13 @@ export default class TruckMsg extends Component {
   }
   OnSale (nu) {
     if (nu) {
-        let newP = this.state.pay + this.state.increase
+        let newP = parseInt(this.state.pay) + parseInt(this.state.increase)
         this.setState({pay: newP})
     } else {
-        let newP = this.state.pay - this.state.increase
-        if (newP <= this.state.increase) {
+        let newP = parseInt(this.state.pay) - parseInt(this.state.increase)
+        if (newP < parseInt(this.state.increase)) {
             Alert.to('不能低于起拍价')
+            return
         } else {
             this.setState({pay: newP})
         }
@@ -116,18 +127,13 @@ export default class TruckMsg extends Component {
         if (!db) return
         let res = JSON.parse(db)
         if (res.status === 1) {
-            alert(res.data)
-            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            alert(res.data.error_msg)
+            let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
             return
         }
         this.context.router.replace(url)
     })
-  }
-  Pay () {
-    let { params: { roomId, truId } } = this.props
-    let nub = parseInt(this.state.data.truck.on_sale.deposite)
-    let url = `/pay/${roomId}/${truId}/${nub}`
-    this.context.router.replace(url)
   }
   componentWillReceiveProps(nextProps) {
     let { params: { roomId, truId } } = nextProps
@@ -142,37 +148,49 @@ export default class TruckMsg extends Component {
         this.refs.BoxBt55.scrollTop = 0
     })
   }
+
   render () {
     let { params: { roomId, truId } } = this.props
-    let {COMM,isRoom,isData, data: {salesroom, truck, truck: { pictures, recondition }}} = this.state
-    let Widths = window.screen.width
-    let otherSalesroom = this.state.data.truck.other_salesroom
-    let otherTrucks = this.state.data.truck.other_trucks
-    let footBtn
-
-    let TXT = typeIsCoun(salesroom.begin_date * 1000, salesroom.finish_date * 1000)
-
-    if(TXT == '已结束'){
+    let {COMM,isRoom,isData, data: {salesroom, truck, truck: { pictures, recondition, config_base }}} = this.state
+    otherSalesroom = this.state.data.truck.other_salesroom
+    otherTrucks = this.state.data.truck.other_trucks
+    if(salesroom.status == '4' || salesroom.status == '5'){
         footBtn = <NavbarPay show={false} />
     } else {
-        footBtn = <NavbarPay show={true}
+        footBtn = <NavbarRF show={true}
                                 numb={truck.on_sale.deposite}
-                                Pay={this.Pay}/>
+                                roomId = {roomId}
+                                truId = {truId}
+                                nub = {truck.on_sale.deposite} />
+        if (truck.paid_for_deposite) {
+            if( salesroom.status == '3'){
+            footBtn = <Navbar style={{top:'-54px'}} nowPrice={truck.current_price}
+                        OnSale = {this.OnSale}
+                        goPay = {this.goPay}
+                        begin = {salesroom.begin_date * 1000}
+                        finish = {salesroom.finish_date * 1000}
+                        pay = {this.state.pay}
+                        status = {3}
+                        times={this.state.showTimes}/>
+            } else {
+                footBtn = <Noavbarpl style={{top:'-54px'}} nowPrice={truck.current_price}
+                        pay = {this.state.pay}
+                        status = {2}
+                        begin = {salesroom.begin_date * 1000}
+                        finish = {salesroom.finish_date * 1000}
+                        times={this.state.showTimes} />
+            }
+        }
     }
-    if (truck.paid_for_deposite) {
-        footBtn = <Navbar nowPrice={truck.current_price}
-                    OnSale = {this.OnSale}
-                    goPay = {this.goPay}
-                    pay = {this.state.pay}/>
-    }
+
     return (
     <div style={{height: '100%'}}>
         <div className="BoxBt55" ref="BoxBt55">
             <div className="diagram swiper-container clear-float" id="diagram">
                 <div className="swiperBox">
-                <ul className="swiper-wrapper" style={{width: `${Widths * pictures.length}px`}}>
+                <ul className="swiper-wrapper" style={{width: `${window.screen.width * pictures.length}px`}}>
                     { pictures.map((db, index) =>
-                    <li className="swiper-slide" style={{width: `${Widths}px`}}>
+                    <li className="swiper-slide" style={{width: `${window.screen.width}px`}}>
                         <Link to={`/room/truck/${truck.id}`} onClick={this.MSG}>
                         <figure><img src={`http://imgb.360che.com${db.src}`} alt="" /></figure>
                         <span className="swiper-pagination">{`${index + 1}/${pictures.length}`}</span>
@@ -182,12 +200,12 @@ export default class TruckMsg extends Component {
                 </ul>
                 </div>
                 <var className="underway" id={`Und${salesroom.id}`}
-                style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'underway' ? '' : 'none'}}>正在进行</var>
+                style={{display: isState(salesroom.status) == 'underway' ? '' : 'none'}}>正在进行</var>
                 <var className="begin" 
-                style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'begin' ? '' : 'none'}}>即将开始</var>
+                style={{display: isState(salesroom.status) == 'begin' ? '' : 'none'}}>即将开始</var>
                 <var className="finish" id={`Feg${salesroom.id}`}
-                style={{display: isState(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == 'finish' ? '' : 'none'}}>已经结束</var>
-                <span className="share"></span>
+                style={{display: isState(salesroom.status) == 'finish' ? '' : 'none'}}>已经结束</var>
+                <span className="share" style={{display: 'none'}}></span>
                 <em className="location">{ truck.license_city }</em>
                 <em className="enshrine" style={{display: 'none'}}>收藏</em>
             </div>
@@ -199,9 +217,9 @@ export default class TruckMsg extends Component {
                     <span><var>{truck.on_sale.bid_persons}</var>人竞拍</span>
                 </div>
                 <div className="time" id={`Cod${salesroom.id}`}>
-                    {dataTimeCountdown(salesroom.begin_date * 1000, salesroom.finish_date * 1000, salesroom.id)}
+                    {dataTimeCountdown(salesroom.begin_date * 1000, salesroom.finish_date * 1000, salesroom.id, salesroom.status, this.upTimes )}
                 </div>
-                <a href={`#clock/${roomId}/${truId}`} className="remind" style={{display: typeIsCoun(salesroom.begin_date * 1000, salesroom.finish_date * 1000) == '已结束'? 'none' : ''}}>设置提醒</a>
+                <a href={`#clock/${roomId}/${truId}`} className="remind" style={{display: typeIsCoun(salesroom.begin_date * 1000, salesroom.finish_date * 1000, salesroom.status ) == '已结束'? 'none' : ''}}>设置提醒</a>
             </div>
             <ul className="condition-list">
                 <li>
@@ -267,31 +285,34 @@ export default class TruckMsg extends Component {
             </div>
 
 
-            <a href={`#room/${salesroom.id}`} className="special">{salesroom.name}（{salesroom.trucks}）</a>
+            <a href={`#room/${salesroom.id}`} className="special" style={{display:'none'}}>{salesroom.name}（{salesroom.trucks}）</a>
 
 
-            <div className="car-configure">
-                <h3>车辆配置<Link href={`#detail/${truck.model_id}`} className="examine">查看详情</Link></h3>
-                <ul className="configure-list" style={{display:'none'}}>
+            <div className="car-configure" style={{marginTop: '10px'}}>
+                <h3>车辆配置</h3>
+                <ul className="configure-list">
                     <li>
-                        <span>驱动形式<i>6X4</i></span>
-                        <span>排放标准<i>国四</i></span>
-                        <span>发动机<i>福田康明斯</i></span>
+                        <span>品牌<i>{config_base[0]? config_base[0] : '--'}</i></span>
+                        <span>VIN码<i>{config_base[7]? config_base[7] : '--'}</i></span>
                     </li>
                     <li>
-                        <span>马力<i>430马力</i></span>
-                        <span>档位<i>16档</i></span>
-                        <span>后桥速比<i>3.083</i></span>
+                        <span>车型<i>{config_base[1]? config_base[1] : '--'}</i></span>
+                        <span>驱动形式<i>{config_base[2]? config_base[2] : '--'}</i></span>
+                        <span>马力<i>{config_base[3]? config_base[3] : '--'}</i></span>
+                    </li>
+                    <li>
+                        <span>变速箱<i>{config_base[4]? config_base[4] : '--'}</i></span>
+                        <span>档位数<i>{config_base[5] ? config_base[5] : '--'}</i></span>
+                        <span>速比<i>{config_base[6]? config_base[6] : '--'}</i></span>
                     </li>
                 </ul>
             </div>
-
             
             <div className="place">
                 <h3>看车地点</h3>
             </div>  
             <div className="locale">
-                <span>{truck.license_city} {truck.address}</span>
+                <span>{truck.license_city} {truck.address} </span>
             </div>
 
             <div className="situation-modul">
@@ -319,7 +340,7 @@ export default class TruckMsg extends Component {
                     <div className="comments-msg">{db.message}</div>
                 </Link>
                 )}
-                <a href={`#review/${roomId}/${truId}`} className="know" onClick={this.goToCom}>我看过车，我来点评</a>
+                <a href={`#review/${roomId}/${truId}`} className="know" onClick={this.goToCom} style={{marginTop: COMM.length == '0' ? '15px' : '0'}}>我看过车，我来点评</a>
             </div>
 
             <div className="same">
@@ -354,17 +375,17 @@ export default class TruckMsg extends Component {
                       <figure><img src={`http://imgb.360che.com${db.cover}`} alt="" /></figure>
                       <Link className="content" to={`/room/${db.id}`}>
                         <div className="time" id={`Cod${db.id}`}>
-                          {dataTimeCountdown(db.begin_date * 1000, db.finish_date * 1000, db.id)}
+                          {dataTimeCountdown(db.begin_date * 1000, db.finish_date * 1000, db.id, db.status)}
                         </div>
                         <h2>{ db.name }</h2>
                         <var>共{ db.trucks }辆车</var>
                       </Link>
                       <var className="underway" id={`Und${db.id}`}
-                        style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'underway' ? '' : 'none'}}>正在进行</var>
+                        style={{display: isState(db.status) == 'underway' ? '' : 'none'}}>正在进行</var>
                       <var className="begin" 
-                        style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'begin' ? '' : 'none'}}>即将开始</var>
+                        style={{display: isState(db.status) == 'begin' ? '' : 'none'}}>即将开始</var>
                       <var className="finish" id={`Feg${db.id}`}
-                        style={{display: isState(db.begin_date * 1000, db.finish_date * 1000) == 'finish' ? '' : 'none'}}>已经结束</var>
+                        style={{display: isState(db.status) == 'finish' ? '' : 'none'}}>已经结束</var>
                       <em className="collect" style={{display: 'none'}}>已收藏</em>
                     </li>
                   )}

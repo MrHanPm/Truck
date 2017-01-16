@@ -6,6 +6,9 @@ import handleScroll from '../utils/handleScroll'
 import { Loading, NoMor, NoData, LoadBox} from '../views/more'
 
 export default class BidREC extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -29,7 +32,8 @@ export default class BidREC extends Component {
           nowPage++
           if (res.status === 1) {
             alert(res.data.error_msg)
-            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
             return
           }
           if(res.data.length === 0){
@@ -76,6 +80,7 @@ export default class BidREC extends Component {
   }
 
   render () {
+    let { params: { roomId, truId } } = this.props
     let footer = null
     let { BID, UID, isData, isLoading} = this.state
     if(isData){
@@ -93,18 +98,21 @@ export default class BidREC extends Component {
         <ul className="bid-list DinHead" data-pb="50" onScroll={this.handleScroll}>
             { BID.map((db,index) =>
             <li key={index}>
-                <span><img src={db.member.avatar} alt="" /></span>
-                <i className="myself" style={{display: db.uid == UID ? '':'none'}}>我</i>
+                <span>
+                  <img src={db.member.avatar} alt="" />
+                  <i className="myself" style={{display: db.uid == UID ? '':'none'}}>我</i>
+                </span>
+                
                 <span>{db.amount}万</span>
                 <span>{dataTimeFormatter(db.create_at * 1000, 10)}</span>
-                <em className="eliminated" style={{display: db.out ? 'none' : ''}}>出局</em>
-                <em className="ahead" style={{display: db.out ? '' : 'none'}}>领先</em>
+                <em className="eliminated" style={{display: db.out ? '' : 'none'}}>出局</em>
+                <em className="ahead" style={{display: db.out ? 'none' : ''}}>领先</em>
             </li>
             )}
-            <li style={{background:'none'}}>{ footer }</li>
+            <li style={{background:'none',display:'block'}}>{ footer }</li>
         </ul>
         <div style={{display: BID.length===0 && !isData ? '':'none'}}><LoadBox /></div>
-        <span className="go-back" onClick ={() => {window.history.back()}}>返回</span>
+        <span className="go-back" onClick ={() => {this.context.router.replace(`/truck/${roomId}/${truId}`)}}>返回</span>
       </div>
     )
   }

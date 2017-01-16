@@ -75,11 +75,11 @@ export default class TruckList extends Component {
         return false
     }
     if (this.state.protocol === 0) {
-        Alert.to('请同意竞拍服务协议')
+        Alert.to('请查看阅读并同意竞拍服务协议')
         return false
     }
     if (this.state.about === 0) {
-        Alert.to('请同意保证金规则')
+        Alert.to('请查看阅读并同意竞拍服务协议')
         return false
     }
     return true
@@ -94,8 +94,9 @@ export default class TruckList extends Component {
             let res = JSON.parse(db)
             let WXCFG = JSON.parse(localStorage.getItem('WXCFG'))
             if (res.status === 1) {
-                alert(res.data)
-                window.location.href = 'http://tao-yufabu.360che.com/member'
+                alert(res.data.error_msg)
+                let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
                 return
             }
             XHR.goPay(res.data)
@@ -184,11 +185,17 @@ export default class TruckList extends Component {
             </div>
             <div className="agree">
                 <div className="agreement-module">
-                    <input type="checkbox" name="protocol" checked={protocol ? 'checked' : '' } onClick={this.CheckForm}/>
+                    <label className="input-ok-ico" For="proc">
+                    <input type="checkbox" name="protocol" className="inputs" checked={protocol ? 'checked' : '' } onChange={this.CheckForm} id="proc" />
+                    <i className="icon-check"></i>
+                    </ label>
                     <span className="agreement">同意<a href="javascript:;" onClick={this.SaveData}>《用户竞拍服务协议》</a></span>
                 </div>
                 <div className="agree-module">
-                    <input type="checkbox" name="about" checked={about ? 'checked' : '' } onClick={this.CheckForm} />
+                    <label className="input-ok-ico" For="abt">
+                    <input type="checkbox" name="about" checked={about ? 'checked' : '' } onChange={this.CheckForm} id="abt" className="inputs" />
+                     <i className="icon-check"></i>
+                    </ label>
                     <span className="agree-rule">同意<a href="#about">《保证金规则》</a></span>
                 </div>
             </div>

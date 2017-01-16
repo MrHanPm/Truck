@@ -13,7 +13,7 @@ class Loading extends Component {
 class NoMor extends Component {
   render () {
     return (
-        <p className="noMor">～我是有底线嘀～</p>
+        <p className="noMor" >～我是有底线嘀～</p>
     )
   }
 }

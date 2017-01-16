@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
+
 import { Tool, Alert } from '../utils/tool'
 import { Loading, NoMor, NoData, LoadBox} from '../views/more'
 import handleScroll from '../utils/handleScroll'

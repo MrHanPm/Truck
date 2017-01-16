@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router'
+import { Link } from 'react-router'
 import { dataTimeFormatter} from '../utils/dateTimeFormatter'
 import { Tool } from '../utils/tool'
 import XHR from '../services/service'
@@ -20,8 +20,9 @@ export default class TruckList extends Component {
       if (!db) return
       let res = JSON.parse(db)
       if (res.status === 1) {
-        alert(res.data)
-        // window.location.href = 'http://tao-yufabu.360che.com/member'
+        alert(res.data.error_msg)
+        let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
         return
       }
       this.setState({MDB: res.data,isData: false})
@@ -33,7 +34,6 @@ export default class TruckList extends Component {
   render () {
     let footer = null
     let Lname = '无'
-     let { params: { depositeId } } = this.props
     let {isData, MDB} = this.state
     if(isData){
         footer = <LoadBox />
@@ -61,7 +61,7 @@ export default class TruckList extends Component {
             <ul className="cash-list">
                 <li>
                     保证金编号
-                    <var>{depositeId}</var>
+                    <var>{MDB.order_id}</var>
                 </li>
                 <li>
                     保证金金额
@@ -87,12 +87,14 @@ export default class TruckList extends Component {
             <h3>竞拍车</h3>
             <ul className="get-list">
                 <li>
+                    <Link to={`/truck/${MDB.salesroom_id}/${MDB.id}`}>
                     <figure><img src={`http://imgb.360che.com${MDB.cover}`} alt="" /></figure>
                     <figcaption>{MDB.fullname}</figcaption>
                     <em>{MDB.explain}</em>
                     <div className="price">
                         <span>起拍价:<var>{MDB.init_price}</var>万</span>
                     </div>
+                    </Link>
                 </li>
             </ul>
         </div>

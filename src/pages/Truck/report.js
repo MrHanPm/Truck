@@ -30,7 +30,8 @@ export default class TruckList extends Component {
         let res = JSON.parse(db)
         if (res.status === 1) { 
             alert(res.data.error_msg)
-            window.location.href = 'http://tao-yufabu.360che.com/member'
+            let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
             return
         }
         this.setState({

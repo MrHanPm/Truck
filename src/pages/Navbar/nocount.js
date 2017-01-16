@@ -22,11 +22,11 @@ export default class Navbar extends Component {
         <span className="return" onClick ={() => {window.history.back()}}></span>
         {dataTimeCountdown(this.props.begin, this.props.finish, 'null', this.props.status, this.upTimes )}
         <span className="prix">
-          <em className="plus" onClick={() => this.props.OnSale(0)}></em>
+          <em className="plusdspl"></em>
           <var> {this.props.pay} </var>
-          <em className="reduce" onClick={() => this.props.OnSale(1)}></em>
+          <em className="reduceplace"></em>
         </span>
-        <i className="bidding" onClick={() => this.props.goPay()}>出价</i>
+        <i className="bidding" style={{background: '#999'}}>出价</i>
         <Link className="menu" to="/index" style={{display: 'none'}}></Link>
         <div className="countdown">
           <div className="Box">

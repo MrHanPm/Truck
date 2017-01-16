@@ -16,7 +16,7 @@ export default class TruckList extends Component {
          uid: 0,
          message: '',
          tags: 0,
-         attachment: 'JZ5rnAuWxxMA-oF0c1ILV06uAq9IWbU6cJ8NZK_Xkz9w1p0sDyK6NGoF_UlSreGy',
+         attachment: '',
          pid: 0,
 
          isSave: true,
@@ -89,11 +89,11 @@ export default class TruckList extends Component {
   }
   checkForm () {
     if (this.state.message.trim() == '') {
-        Alert.to('内容不能为空')
+        Alert.to('评价内容不能为空')
         return false
     }
     if (this.state.star === 0) {
-       Alert.to('必须总体评价')
+       Alert.to('请对车源总体评价打分')
        return false
     }
     return true
@@ -102,14 +102,15 @@ export default class TruckList extends Component {
     if (this.checkForm() && this.state.isSave) {
       this.setState({isSave: false})
       let db = this.state
-      // db.attachment = this.state.msgVlue.join('-')
+      db.attachment = this.state.msgVlue.join(',')
       XHR.addPosts(db)
       .then((db) => {
           if (!db) return
           let res = JSON.parse(db)
           if (res.status === 1) {
             alert(res.data.error_msg)
-            // window.location.href = 'http://tao-yufabu.360che.com/member'
+            let url = window.location.href
+        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
             return
           }
           AllMsgToast.to('发表成功')

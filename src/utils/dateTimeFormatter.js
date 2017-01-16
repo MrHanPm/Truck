@@ -56,23 +56,25 @@ export const dataTimeFormatter = (time, type) => {
 }
 
 /**
-*首页中间状态*
+*是否显示设置时间
 */
-export const typeIsCoun = (Stime, Etime) => {
-  let Now = Math.round(new Date().getTime())
-  let Nt = dataTimeFormatter(Now)
+export const typeIsCoun = (Stime, Etime, status) => {
+  // let Now = Math.round(new Date().getTime())
+  let json = {}
+  // json.Nt = dataTimeFormatter(Now)
   // 真实
-  let St = dataTimeFormatter(Stime)
-  let Et = dataTimeFormatter(Etime)
-
-  if (Nt > Et) {
+  json.St = Stime
+  json.Et = Etime
+  localStorage.setItem('ALARMCLOCK', JSON.stringify(json))
+  
+  if (status == '4' || status == '5') {
     return '已结束'
   }else{
     return '在进行'
   }
 }
 
-export const dataTimeCountdown = (Stime, Etime, id) => {
+export const dataTimeCountdown = (Stime, Etime, id, status, funs) => {
   let Now = Math.round(new Date().getTime())
   let Nt = dataTimeFormatter(Now)
   // 模拟
@@ -84,14 +86,14 @@ export const dataTimeCountdown = (Stime, Etime, id) => {
   let Et = dataTimeFormatter(Etime)
   let str = dataTimeFormatter(Stime, 8)
   // console.log(St, Et)
-  if (Nt < St) {
-    return '开始时间：' + str
+  if(status == '2') {
+      return '开始时间：' + str
   }
-  if (Nt > Et) {
+  if (status == '4' || status == '5') {
     return '已结束'
   }
-  if (Nt > St && Nt < Et) {
-    return CountdownDiv(Etime, id)
+  if (status == '3') {
+    return CountdownDiv(Etime, id, funs)
   }
 }
 
@@ -99,12 +101,16 @@ export const dataTimeCountdown = (Stime, Etime, id) => {
 /**
 UI计时状态
 */
-const CountdownDiv = (Etime, id) => {
+const CountdownDiv = (Etime, id, funs) => {
   let dov = 'Cod' + id
   
     setTimeout(function() {
       BackCountdown(Etime, (msg) => {
         try{
+          if( typeof(funs) == 'function'){
+            let Fss = msg.replace(/距离结束：/, '')
+            funs(Fss)
+          }
         document.getElementById(dov).innerHTML = msg
         if (msg == '已结束') {
           let underway = 'Und' + id
@@ -114,7 +120,7 @@ const CountdownDiv = (Etime, id) => {
         }
         }catch(err){}
       })
-    }, 100)
+    }, 1000)
   
 }
 /**
@@ -163,18 +169,19 @@ const getCountdown = (Etime) => {
 /**
 首页左上角状态
 */
-export const isState = (Stime, Etime) => {
-  let Now = Math.round(new Date().getTime())
-  let Nt = dataTimeFormatter(Now)
-  let St = dataTimeFormatter(Stime)
-  let Et = dataTimeFormatter(Etime)
-  if (Nt < St) {
+// export const isState = (Stime, Etime) => {
+export const isState = (status) => {
+  // let Now = Math.round(new Date().getTime())
+  // let Nt = dataTimeFormatter(Now)
+  // let St = dataTimeFormatter(Stime)
+  // let Et = dataTimeFormatter(Etime)
+  if (status == '2') {
     return 'begin'
   }
-  if (Nt > Et) {
+  if (status == '4' || status == '5') {
     return 'finish'
   }
-  if (Nt > St && Nt < Et) {
+  if (status == '3') {
     return 'underway'
   }
 }
