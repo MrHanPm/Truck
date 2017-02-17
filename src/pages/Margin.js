@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { dataTimeFormatter} from '../utils/dateTimeFormatter'
 import { Tool } from '../utils/tool'
+import { Link } from 'react-router'
 import XHR from '../services/service'
 import { LoadBox } from '../views/more'
 
@@ -18,13 +19,9 @@ export default class TruckList extends Component {
         .then((db) => {
           if (!db) return
           let res = JSON.parse(db)
-          if (res.status === 1) {
-            alert(res.data.error_msg)
-            let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-            return
-          }
-          this.setState({MDB: res.data,isData: false})
+            if(XHR.isAlert(res)) {
+                this.setState({MDB: res.data,isData: false})
+            }
         })
     }
   render () {
@@ -44,6 +41,8 @@ export default class TruckList extends Component {
         case '3' :
             Lname = '已取消'
             break
+        default :
+            Lname = null
      }
     return (
     <div style={{height: '100%'}}>
@@ -67,22 +66,24 @@ export default class TruckList extends Component {
             </li>
             <li>
                 获拍时间
-                <var>{MDB.create_at.length>6?dataTimeFormatter(MDB.create_at * 1000, 7):'- -'}</var>
+                <var>{MDB.create_at > 6 ? dataTimeFormatter(MDB.create_at * 1000, 7) : '- -'}</var>
             </li>
         </ul>
         <div className="business">
-            <label>线下交易地址</label>   
+            <label>线下交易地址</label>
             <span className="area">{MDB.address}</span>
         </div>
         <h3>获拍车</h3>
-        <ul className="get-list">
+        <ul className="get-list" style={{marginBottom: '150px'}}>
             <li>
+                <Link to={`/truck/${MDB.salesroom_id}/${MDB.truck_id}`}>
                 <figure><img src={`http://imgb.360che.com${MDB.cover}`} alt="" /></figure>
                 <figcaption>{MDB.fullname}</figcaption>
                 <em>{MDB.explain}</em>
                 <div className="price">
                     <span>起拍价:<var>{MDB.init_price}</var>万</span>
                 </div>
+                </Link>
             </li>
         </ul>
       </div>

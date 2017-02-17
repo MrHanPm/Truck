@@ -5,6 +5,9 @@ import Navbar from '../Navbar/comment'
 
 
 export default class TruckList extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
   constructor (props) {
     super(props)
     this.state = {
@@ -48,21 +51,23 @@ export default class TruckList extends Component {
   chooseImage () {
     let that = this
     let imageList = this.state.imageList
-    let counts = 3 - imageList.length
-    if(imageList.length < 4){
+    let counts = 9 - imageList.length
+    if(imageList.length < 9){
       wx.chooseImage({
         count: counts,
-        sizeType: ['compressed'], // 可以指定是原图还是压缩图，默认二者都有
+        sizeType: ['compressed'],
         sourceType: ['album'],
         success: function (res) {
           imageList.push(...res.localIds)
           that.uploadImg(res.localIds)
-          imageList.splice(4,imageList.length - 4)
+          imageList.splice(9,imageList.length - 9)
           // that.setState({
           //   imageList:imageList
           // })
         }
       })
+    } else {
+      this.refs.addPic.style.display = 'none'
     }
   }
   uploadImg (obj) {
@@ -99,22 +104,21 @@ export default class TruckList extends Component {
     return true
   }
   onSave () {
-    if (this.checkForm() && this.state.isSave) {
-      this.setState({isSave: false})
+    if (this.checkForm()) {
+      // this.setState({isSave: false})
+      let { params: { roomId, truId } } = this.props
       let db = this.state
       db.attachment = this.state.msgVlue.join(',')
       XHR.addPosts(db)
-      .then((db) => {
-          if (!db) return
-          let res = JSON.parse(db)
-          if (res.status === 1) {
-            alert(res.data.error_msg)
-            let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-            return
+      .then((dbs) => {
+          if (!dbs) return
+          let res = JSON.parse(dbs)
+          if(XHR.isAlert(res)) {
+            AllMsgToast.to('发表成功')
+            // window.history.back()
+            let urls = `/comment/${db.salesroom_id}/${db.truck_id}`
+            this.context.router.replace(urls)
           }
-          AllMsgToast.to('发表成功')
-          window.history.back()
       })
     }
   }
@@ -162,7 +166,7 @@ export default class TruckList extends Component {
                         )}
                     </ul>
                     <div className="add-box">
-                        <span className="add-pic" onClick={this.chooseImage}></span>
+                        <span className="add-pic" ref="addPic" onClick={this.chooseImage}></span>
                     </div>
                 </div>
             </div>

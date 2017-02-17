@@ -43,28 +43,23 @@ export default class TruckList extends Component {
     .then((db) => {
       if (!db) return
       let res = JSON.parse(db)
-      if (res.status === 1) { 
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
+      if(XHR.isAlert(res)) {
+        this.setState({
+          isData: true,
+          DATA: res.data,
+          isPay: TRUCK.paid_for_deposite,
+          state: TRUCK.status,
+          deposite: TRUCK.deposite,
+          roomId: TRUCK.roomId,
+          beginDate: TRUCK.begin_date,
+          finishDate: TRUCK.finish_date
+        })
       }
-      this.setState({
-        isData: true,
-        DATA: res.data,
-        isPay: TRUCK.paid_for_deposite,
-        state: TRUCK.status,
-        deposite: TRUCK.deposite,
-        roomId: TRUCK.roomId,
-        beginDate: TRUCK.begin_date,
-        finishDate: TRUCK.finish_date
-      })
     })
   }
   Pay () {
     let { params: { truckId } } = this.props
-    let nub = parseInt(this.state.deposite)
-    let url = `/pay/${this.state.roomId}/${truckId}/${nub}`
+    let url = `/pay/${this.state.roomId}/${truckId}/${this.state.deposite}`
     this.context.router.replace(url)
   }
   componentDidMount() {
@@ -72,17 +67,11 @@ export default class TruckList extends Component {
   }
   render () {
     let { DATA, isPay, state, deposite, isData,beginDate,finishDate } = this.state
-    let footBtn
-    if(state == '4' || state == '5'){
-        footBtn = <NavbarPay show={false} />
-    } else {
-           footBtn = <NavbarPay show={true}
-                                numb={deposite}
-                                Pay={this.Pay}/>
-    }
-    if (isPay) {
-        footBtn = <Navbar />
-    }
+    let footBtn = <NavbarPay show={true} numb={deposite} Pay={this.Pay} />
+
+    if (state == '4' || state == '5'){ footBtn = <NavbarPay show={false} /> }
+    if (state != '4' && state != '5' && isPay){ footBtn = <Navbar /> }
+
     return (
       <div style={{height: '100%'}}>
         <ul className="picture-list">

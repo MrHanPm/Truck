@@ -29,57 +29,46 @@ export default class Welcomes extends Component {
     .then((db) => {
       if (!db) return
       let res = JSON.parse(db)
-      if (res.status === 1) { 
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
+      if(XHR.isAlert(res)) {
+        this.setState({myBids: res.data})
+        return true
+      } else {
+        return false
       }
-      this.setState({myBids: res.data})
     })
-    XHR.myWin(1)
-    .then((db) => {
-      if (!db) return
-      let res = JSON.parse(db)
-      if (res.status === 1) { 
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
+    .then( (objs) => {
+      if (objs) {
+      XHR.myWin(1)
+      .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        if(XHR.isAlert(res)) {
+          this.setState({myWins: res.data})
+        }
+      })
+      XHR.myDep(1)
+      .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        if(XHR.isAlert(res)) {
+          this.setState({myDepos: res.data})
+        }
+      })
+      XHR.myRem(1)
+      .then((db) => {
+        if (!db) return
+        let res = JSON.parse(db)
+        if(XHR.isAlert(res)) {
+          this.setState({myReminds: res.data,isData: false})
+        }
+      })
       }
-      this.setState({myWins: res.data})
     })
-    XHR.myDep(1)
-    .then((db) => {
-      if (!db) return
-      let res = JSON.parse(db)
-      if (res.status === 1) { 
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
-      }
-      this.setState({myDepos: res.data})
-    })
-    XHR.myRem(1)
-    .then((db) => {
-      if (!db) return
-      let res = JSON.parse(db)
-      if (res.status === 1) { 
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
-      }
-      this.setState({myReminds: res.data,isData: false})
-    })
-
   }
   componentWillUnmount () {
     
   }
   delREM(e) {
-    console.log(4444444,e)
     this.setState({
       isShowCF: true,
       DELID: e.target.dataset.id,
@@ -98,18 +87,14 @@ export default class Welcomes extends Component {
       .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        if (res.status === 1) { 
-          alert(res.data.error_msg)
-          let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-          return
+        if(XHR.isAlert(res)) {
+          myReminds.splice(DELINX,1)
+          this.setState({
+            myReminds: myReminds,
+            isShowCF: false
+          })
+          AllMsgToast.to('删除成功')
         }
-        myReminds.splice(DELINX,1)
-        this.setState({
-          myReminds: myReminds,
-          isShowCF: false
-        })
-        AllMsgToast.to('删除成功')
       })
     }
   }
@@ -124,7 +109,7 @@ export default class Welcomes extends Component {
         <div className="BoxBt55">
           <h3>我的竞拍</h3>
           <p className="noMor" style={{display: myBids.length===0?'':'none'}}>～暂无数据～</p>
-          <ul className="swiper" style={{display: myDepos.length===0?'none':''}}>
+          <ul className="swiper" style={{display: myBids.length===0?'none':''}}>
             {myBids.map((db,index) =>
             <li key={index}>
               <a href={`#truck/${db.salesroom_id}/${db.truck_id}`}>
@@ -147,15 +132,15 @@ export default class Welcomes extends Component {
 
           <h3>我的获拍</h3>
           <p className="noMor" style={{display: myWins.length === 0 ? '':'none'}}>～暂无数据～</p>
-          <ul className="acquire-list" style={{display: myDepos.length === 0 ? 'none' : ''}}>
+          <ul className="acquire-list" style={{display: myWins.length === 0 ? 'none' : ''}}>
             {myWins.map((db,index) =>
             <li key={index}>
-              <Link to={`/margin/${db.bid_id}`}>
+              <Link to={`/margin/${db.id}`}>
                 <figure>
                   <img src={`http://imgb.360che.com${db.src}`} alt="" />
                 </figure>
                 <figcaption>{db.fullname}</figcaption>
-                <span>成交价: <em>{db.mount}万</em></span>
+                <span>成交价: <em>{db.amount}万</em></span>
                 <span>{dataTimeFormatter(db.create_at * 1000, 11)}</span>
               </Link>
             </li>
@@ -176,10 +161,16 @@ export default class Welcomes extends Component {
                   <i className="freeze" style={{display: db.pay_status == '1' ? '' : 'none'}}>未付款</i>
                   <i className="freeze" style={{display: db.pay_status == '2' ? '' : 'none'}}>冻结中</i>
                   <i className="restoration" style={{display: db.pay_status == '4' ? '' : 'none'}}>已返还</i>
-                  <i className="deduct" style={{display: db.pay_status == '3' ? '' : 'none'}}>已扣除</i>
+                  <i className="deduct" style={{display: db.pay_status == '3' ? '' : 'none'}}>支付成功</i>
                 </div>
-                <var className="underway">正在进行</var>
-                <var className="finish" style={{display: 'none'}}>已经结束</var>
+                <var className="underway"
+                    style={{display: db.salesroom_status == 3 ? '' : 'none'}}>正在进行</var>
+                <var className="begin" 
+                    style={{display: db.salesroom_status == 2 ? '' : 'none'}}>即将开始</var>
+                <var className="finish"
+                    style={{display: db.salesroom_status == 4 ? '' : 'none'}}>已经结束</var>
+                <var className="finish"
+                    style={{display: db.salesroom_status == 5 ? '' : 'none'}}>已经结束</var>
               </Link>
             </li>
             )}
@@ -187,14 +178,14 @@ export default class Welcomes extends Component {
 
           <h3>我的提醒</h3>
           <p className="noMor" style={{display: myReminds.length===0?'':'none'}}>～暂无数据～</p>
-          <ul className="remind-list" style={{display: myDepos.length === 0 ? 'none' : ''}}>
+          <ul className="remind-list" style={{display: myReminds.length === 0 ? 'none' : ''}}>
           {myReminds.map((db,index) =>
             <li key={index}>
-              <Link to={`/truck/${db.salesroom_id}/${db.truck_id}`}>
+              <Link to={db.truck_id == '0' ? `/room/${db.salesroom_id}` :`/truck/${db.salesroom_id}/${db.truck_id}`}>
               <figure><img src={`http://imgb.360che.com${db.cover}`} alt="" /></figure>
               <figcaption>{db.title}</figcaption>
-              <span>开始时间: 2016年09月20日  14:00</span>
-              <em>结束时间: 2016年09月21日  21:00</em>
+              <span>开始时间: {dataTimeFormatter(db.begin_date * 1000)}</span>
+              <em>结束时间: {dataTimeFormatter(db.finish_date * 1000)}</em>
               </Link>
               <i data-id={db.id} data-inx={index} onClick={this.delREM}>删除提醒</i>
               <var className="underway"
@@ -203,6 +194,8 @@ export default class Welcomes extends Component {
                     style={{display: db.salesroom_status == 2 ? '' : 'none'}}>即将开始</var>
                 <var className="finish"
                     style={{display: db.salesroom_status == 4 ? '' : 'none'}}>已经结束</var>
+                <var className="finish"
+                    style={{display: db.salesroom_status == 5 ? '' : 'none'}}>已经结束</var>
             </li>
             )}
           </ul>

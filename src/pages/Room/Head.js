@@ -27,7 +27,11 @@ export default class Heads extends Component {
           <li>
             <figure><img src={`http://imgb.360che.com${db.cover}`} alt="" /></figure>
             <div className="content">
-              <div className="time">
+              <div className="time" style={{display: isState(db.status) == 'finish' ? 'none' : ''}}>
+                结束时间：
+                {dataTimeFormatter(db.finish_date * 1000)}
+              </div>
+              <div className="time" style={{display: isState(db.status) == 'finish' ? '' : 'none'}}>
                 开始时间：
                 {dataTimeFormatter(db.begin_date * 1000)}
               </div>

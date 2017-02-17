@@ -30,24 +30,20 @@ export default class BidREC extends Component {
           if (!db) return
           let res = JSON.parse(db)
           nowPage++
-          if (res.status === 1) {
-            alert(res.data.error_msg)
-            let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-            return
-          }
-          if(res.data.length === 0){
-            this.setState({
-              isData: true
-            })
-          }else{
-            this.setState({
-              UID: USERINFO.uid,
-              BID: res.data,
-              nowPage: nowPage,
-              iaLod: res.data.length < 20 ? false : true,
-              isLoading: res.data.length < 20 ? false : true
-            })
+          if(XHR.isAlert(res)) {
+            if(res.data.length === 0){
+              this.setState({
+                isData: true
+              })
+            }else{
+              this.setState({
+                UID: USERINFO.uid,
+                BID: res.data,
+                nowPage: nowPage,
+                iaLod: res.data.length < 20 ? false : true,
+                isLoading: res.data.length < 20 ? false : true
+              })
+            }
           }
       })
   }
@@ -63,17 +59,19 @@ export default class BidREC extends Component {
         let res = JSON.parse(db)
         nowPage++
         BID.push(...res.data)
-        if(res.data.length < 20) {
-          this.setState({
-            BID: BID,
-            isLoading: false
-          })
-        }else{
-          this.setState({
-            BID: BID,
-            nowPage: nowPage,
-            iaLod: true
-          })
+        if(XHR.isAlert(res)) {
+          if(res.data.length < 20) {
+            this.setState({
+              BID: BID,
+              isLoading: false
+            })
+          } else {
+            this.setState({
+              BID: BID,
+              nowPage: nowPage,
+              iaLod: true
+            })
+          }
         }
       })
     }

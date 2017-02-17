@@ -19,13 +19,9 @@ export default class TruckList extends Component {
     .then((db) => {
       if (!db) return
       let res = JSON.parse(db)
-      if (res.status === 1) {
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
-      }
-      this.setState({MDB: res.data,isData: false})
+        if(XHR.isAlert(res)) {
+            this.setState({MDB: res.data,isData: false})
+        }
     })
   }
   componentDidMount() {
@@ -38,7 +34,7 @@ export default class TruckList extends Component {
     if(isData){
         footer = <LoadBox />
     }
-    switch (MDB.order_status) {
+    switch (MDB.pay_status) {
         case '1' :
             Lname = '未付款'
             break
@@ -46,11 +42,13 @@ export default class TruckList extends Component {
             Lname = '已付款'
             break
         case '3' :
-            Lname = '已扣除'
+            Lname = '支付成功'
             break
         case '4' :
-            Lname = '已退还'
+            Lname = '已返还'
             break
+        default :
+            Lname = null
      }
     return (
     <div style={{height: '100%'}}>
@@ -85,9 +83,9 @@ export default class TruckList extends Component {
                 </li>
             </ul>
             <h3>竞拍车</h3>
-            <ul className="get-list">
+            <ul className="get-list" style={{marginBottom: '150px'}}>
                 <li>
-                    <Link to={`/truck/${MDB.salesroom_id}/${MDB.id}`}>
+                    <Link to={`/truck/${MDB.salesroom_id}/${MDB.truck_id}`}>
                     <figure><img src={`http://imgb.360che.com${MDB.cover}`} alt="" /></figure>
                     <figcaption>{MDB.fullname}</figcaption>
                     <em>{MDB.explain}</em>

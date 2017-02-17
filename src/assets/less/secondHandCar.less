@@ -190,7 +190,7 @@
 .comments-list .caption{font-size:12px;color:#555;}
 .comments-list .date{font-size:12px;color:#999;}
 .comments-list .score{float:right;margin-top:23px;}
-.comments-msg{line-height:24px;padding:0 47px 15px 54px;font-size:16px;color:#111;}
+.comments-msg{line-height:24px;padding:0 15px 15px 54px;font-size:16px;color:#111;}
 .know{display:block;width:200px;height:32px;line-height:32px;border:1px solid #f85200;text-align:center;margin:0 auto;font-size:14px;color:#f85200;border-radius:16px;}
 .know:after{font-family: 'second';content:"\53f3";font-size:12px;margin-left:8px;}
 
@@ -274,7 +274,7 @@ header .reference span i{font-size:16px;color:#f85200;font-weight:bold;}
 .acquire-list li span em{line-height:16px;font-size:16px;color:#f85200;}
 
 /*我的保证金*/
-.bail-list .underway,.bail-list .finish{position:absolute;top:24px;left:15px;}
+.bail-list .underway,.bail-list .begin,.bail-list .finish{position:absolute;top:24px;left:15px;}
 .bail-list{background:#fff;margin-bottom:10px;}
 .bail-list li,.remind-list li{position:relative;padding:15px 15px 15px 105px;border-bottom:1px solid #e5e5e5;overflow:hidden;}
 .bail-list li:last-child{border:none;}
@@ -285,7 +285,7 @@ header .reference span i{font-size:16px;color:#f85200;font-weight:bold;}
 .bail-list li .bail{overflow:hidden;}
 .bail-list li .bail > span{line-height:16px;font-size:16px;color:#999;}
 .bail-list li .bail em{line-height:16px;font-size:18px;color:#f85200;}
-.bail-list li .bail .freeze,.restoration,.deduct{float:right;width:44px;height:16px;line-height:16px;border-radius:2px;margin-top:4px;background:#999;font-size:12px;color:#fff;text-align:center;}
+.bail-list li .bail .freeze,.restoration,.deduct{float:right;min-width:44px;height:16px;line-height:16px;border-radius:2px;margin-top:4px;background:#999;font-size:12px;color:#fff;text-align:center;}
 .bail-list li .bail .restoration{background:#02bb00;}
 .bail-list li .bail .deduct{background:#ffbe00;}
 
@@ -369,8 +369,8 @@ header .reference span i{font-size:16px;color:#f85200;font-weight:bold;}
 .warn li:last-child{border:none;}
 .way li{position:relative;height:59px;line-height:60px;font-size:16px;color:#333;padding:0 15px;border-bottom:1px solid #e5e5e5;overflow:hidden;}
 .way li:last-child{border:none;}
-.way .Phone{float:right;border:none;outline:none;margin-top:18px;font-size: 16px;
-    height: 24px; text-align: right;line-height: 24px;
+.way .Phone{border:none;outline:none;margin-top:18px;font-size: 16px;
+    height: 24px; text-align: right;line-height: 24px; position: absolute; right: 15px;top: 0; background-color: transparent;
 }
 .way li a{float:right;width:60px;height:40px;line-height:40px;background:#09bb07;border:1px solid #029400;margin:10px 0 0 15px;border-radius:6px;font-size:16px;color:#fff;text-align:center;}
 footer p{font-size:12px;color:#999;text-align:center;margin-top:20px;}
@@ -511,7 +511,7 @@ footer p{font-size:12px;color:#999;text-align:center;margin-top:20px;}
     left: 0;
     width:12px;height:12px;line-height:12px;background:#fff;border:1px solid #d0d0d0;border-radvius:1px; display:inline-block;
 }
-.agree .inputs:checked + .icon-check:before{position:absolute;top:50%;left:50%;font-family: 'weui';content:"\EA08";color:#09bb07;font-size:7px;text-align:center;font-style:normal;font-variant:normal;text-transform: none;speak: none;vertical-align: middle;text-decoration: inherit;transform: translate(-50%, -48%) scale(0.73);-webkit-transform: translate(-50%, -48%) scale(0.73);}
+.agree .inputs:checked + .icon-check:before{position:absolute;top:50%;left:50%;font-family: 'weui';content:"\EA08";color:#09bb07;font-size:20px;text-align:center;font-style:normal;font-variant:normal;text-transform: none;speak: none;vertical-align: middle;text-decoration: inherit;transform: translate(-50%, -48%) scale(0.73);-webkit-transform: translate(-50%, -48%) scale(0.73);}
 
 /*页面修改样式*/
 .comments-list .good{float:right;margin-right:4px;}

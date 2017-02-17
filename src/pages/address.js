@@ -25,20 +25,16 @@ export default class Addres extends Component {
       let res = JSON.parse(db)
       let AZ = []
       let DATA = []
-      if (res.status === 1) {
-        alert(res.data.error_msg)
-        let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-        return
+      if(XHR.isAlert(res)) {
+        for(let key in res.data){
+          AZ.push(key)
+          DATA.push([])
+        }
+        this.setState({
+          AZ: AZ,
+          DATA: res.data
+        })
       }
-      for(let key in res.data){
-        AZ.push(key)
-        DATA.push([])
-      }
-      this.setState({
-        AZ: AZ,
-        DATA: res.data
-      })
     })
   }
   componentDidMount() {

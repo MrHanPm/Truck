@@ -4,6 +4,7 @@
 
 const Pna = {
 guiseFront: '正面45度',
+slGuiseFront: '封面图',
 guiseBack: '后面45度',
 front: '正前',
 back: '正后',

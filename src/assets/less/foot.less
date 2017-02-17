@@ -40,7 +40,7 @@ body{background:#f5f5f5;}
 .agree-btn,.sure-btn{display: -webkit-box;display: -ms-flexbox;display:flex;}
 .agree-btn .agree,.sure-btn .sure{-webkit-box-flex:1;-moz-box-flex: 1;-ms-flex:1;flex: 1;}
 .agree-btn .disagree,.sure-btn .sure-btn{-webkit-box-flex:2;-moz-box-flex:2;-ms-flex:2;flex:2;}
-.agree-btn,.auction,.sure-btn{height:50px;background: #FAFBFC;box-shadow: 0px -1px 2px 0px rgba(0,0,0,0.05);margin-top:10px;padding:0 15px;}
+.agree-btn,.auction,.sure-btn{height:50px;background: #FAFBFC;box-shadow: 0px -1px 2px 0px rgba(0,0,0,0.05);margin-top:10px;padding:0 15px; box-sizing: border-box;}
 .agree-btn span,.sure-btn span{display:inline-block;font-size:14px;text-align:center;line-height:36px;margin-top:7px;}
 .agree-btn .agree,.sure-btn .sure{width:100px;height:36px;border:1px solid #e5e5e5;border-radius:18px;background:#fff;color:#333;margin-right:15px;}
 .agree-btn .disagree,.sure-btn .cancel{width:230px;height:36px;border:1px solid #d64700;border-radius:18px;background:#f85200;color:#fff;}
@@ -88,7 +88,11 @@ body{background:#f5f5f5;}
 .footer .bidding{position:relative;display:block;width:85px;height:36px;line-height:36px;border-radius:18px;background:#f85200;font-size:16px;color:#fff;text-align:center;margin:7px 0 0 15px;}
 .footer .bidding:before{position:absolute;top:-15px;right:40px;width:6px;height:6px;content:"";border-right:1px solid #F85200;border-top:1px solid #f85200;background: rgba(255,255,255,0.95);-webkit-transform: rotate(136deg);transform: rotate(136deg);}
 
-
+.auction .baozi{
+    display: inline-block;
+    width: 170px;
+    flex:none;
+}
 
 
 

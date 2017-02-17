@@ -3,9 +3,6 @@ import { Link } from 'react-router'
 
 
 export default class Navbar extends Component {
-  shouldComponentUpdate(nextProps, nextState){
-    return false
-  }
   render () {
     return (
       <div className={`detail-foot ${this.props.className}`} style={this.props.style}>

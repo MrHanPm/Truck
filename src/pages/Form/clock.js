@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 // import { Link } from 'react-router'
 import handleChange from '../../utils/handleChange'
 import { Alert, Tool, AllMsgToast } from '../../utils/tool'
-import Navbar from '../Navbar/yesNo'
+// import Navbar from '../Navbar/yesNo'
 import XHR from '../../services/service'
 import { dataTimeFormatter } from '../../utils/dateTimeFormatter'
 
@@ -56,36 +56,20 @@ export default class TruckList extends Component {
     let { ALARMCLOCK } = this.state
     // console.log(this.state.ALARMCLOCK)
     let Nows = new Date()
-    Nows.setMonth(Nows.getMonth()-5)
     let Eows = new Date()
-    Eows.setMonth(Eows.getMonth()-30)
-    let Eow = Eows
-    let Nt = dataTimeFormatter(Nows)
-    let NEt = dataTimeFormatter(Eow)
-    let St = dataTimeFormatter(ALARMCLOCK.ST)
-    let Et = dataTimeFormatter(ALARMCLOCK.Et)
+    let STSS = new Date(parseInt(ALARMCLOCK.St))
+    let ETSS = new Date(parseInt(ALARMCLOCK.Et))
+    STSS.setMinutes(STSS.getMinutes()-5)
+    ETSS.setMinutes(ETSS.getMinutes()-30)
 
-    if (e.target.value > 300) {
+    let Nt = dataTimeFormatter( Date.parse(Nows) )
+    let NEt = dataTimeFormatter( Date.parse(Eows) )
+    let St = dataTimeFormatter(Date.parse(STSS))
+    let Et = dataTimeFormatter(Date.parse(ETSS))
+    // console.log(Et > NEt,Et , NEt)
+    if (e.target.value == '300') {
          if( Nt < St ) {
-            this.refs.fivs.disabled = false
-            if(e.target.checked){
-                this.setState({
-                    end_difference: e.target.value
-                })
-            } else {
-                this.setState({
-                    end_difference: 0
-                })
-            }
-        } else {
-            this.refs.fivs.checked = false
-            this.refs.fivs.disabled = true
-            Alert.to('开拍前已经超过5分钟')
-            return false
-        }
-    } else {
-        if( Et > NEt ) {
-             this.refs.overs.disabled = false
+            // this.refs.fivs.disabled = false
             if(e.target.checked){
                 this.setState({
                     start_difference: e.target.value
@@ -96,9 +80,27 @@ export default class TruckList extends Component {
                 })
             }
         } else {
+            this.refs.fivs.checked = false
+            // this.refs.fivs.disabled = true
+            Alert.to('拍卖专场即将开始或已经开始，无需设置提醒啦')
+            return false
+        }
+    } else {
+        if( Et > NEt ) {
+             // this.refs.overs.disabled = false
+            if(e.target.checked){
+                this.setState({
+                    end_difference: e.target.value
+                })
+            } else {
+                this.setState({
+                    end_difference: 0
+                })
+            }
+        } else {
             this.refs.overs.checked = false
-            this.refs.overs.disabled = true
-            Alert.to('结束前已经超过30分钟')
+            // this.refs.overs.disabled = true
+            Alert.to('拍卖专场即将结束，无需设置提醒啦')
             return false
         }
     }
@@ -111,14 +113,10 @@ export default class TruckList extends Component {
         .then((db) => {
             if (!db) return
             let res = JSON.parse(db)
-            if (res.status === 1) {
-                alert(res.data.error_msg)
-                let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-                return
+            if(XHR.isAlert(res)) {
+                AllMsgToast.to('设置成功')
+                window.history.back()
             }
-            AllMsgToast.to('设置成功')
-            window.history.back()
         })
     }
   }
@@ -166,8 +164,10 @@ export default class TruckList extends Component {
             </div>
             <footer><p>已设置的提醒可在“我的拍卖-我的提醒”中找到</p></footer>
         </div>
-        <Navbar className="FotSty"
-                addClock={this.crtClick}/>
+        <div className="sure-btn FotSty" style={{width: '100%'}}>
+            <span className="sure" onClick ={() => {window.history.back()}}>取消</span>
+            <span className="cancel" onClick={this.crtClick}>确定</span>
+        </div>
     </div>
     )
   }

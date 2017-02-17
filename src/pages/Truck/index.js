@@ -51,12 +51,14 @@ export default class TruckMsg extends Component {
     .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        this.setState({
-            data: res.data,
-            increase: res.data.truck.on_sale.increase,
-            pay: Math.round(res.data.truck.on_sale.increase),
-            isData: true
-        })
+        if(XHR.isAlert(res)) {
+            this.setState({
+                data: res.data,
+                increase: res.data.truck.on_sale.increase,
+                pay: Math.round(res.data.truck.on_sale.increase),
+                isData: true
+            })
+        }
     })
     json.salesroom_id = roomId
     json.truck_id = truId
@@ -66,9 +68,11 @@ export default class TruckMsg extends Component {
     .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        this.setState({
-            COMM: res.data.posts
-        })
+        if(XHR.isAlert(res)) {
+            this.setState({
+                COMM: res.data.posts
+            })
+        }
     })
   }
   componentDidMount() {
@@ -88,13 +92,14 @@ export default class TruckMsg extends Component {
     }
   }
   MSG () {
+    let { data } = this.state
     let json = {}
-    json.paid_for_deposite = this.state.data.truck.paid_for_deposite
-    json.status = this.state.data.truck.status
-    json.deposite = this.state.data.truck.on_sale.deposite
-    json.roomId = this.state.data.salesroom.id
-    json.begin_date = this.state.data.salesroom.begin_date
-    json.finish_date = this.state.data.salesroom.finish_date
+    json.paid_for_deposite = data.truck.paid_for_deposite
+    json.status = data.salesroom.status
+    json.deposite = data.truck.on_sale.deposite
+    json.roomId = data.salesroom.id
+    json.begin_date = data.salesroom.begin_date
+    json.finish_date = data.salesroom.finish_date
     Tool.localItem('TRUCK', JSON.stringify(json))
   }
   goToCom(){
@@ -126,13 +131,9 @@ export default class TruckMsg extends Component {
     .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        if (res.status === 1) {
-            alert(res.data.error_msg)
-            let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-            return
+        if(XHR.isAlert(res)) {
+            this.context.router.replace(url)
         }
-        this.context.router.replace(url)
     })
   }
   componentWillReceiveProps(nextProps) {
@@ -141,11 +142,13 @@ export default class TruckMsg extends Component {
     .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        this.setState({
-            data: res.data,
-            isData: true
-        })
-        this.refs.BoxBt55.scrollTop = 0
+        if(XHR.isAlert(res)) {
+            this.setState({
+                data: res.data,
+                isData: true
+            })
+            this.refs.BoxBt55.scrollTop = 0
+        }
     })
   }
 
@@ -229,8 +232,6 @@ export default class TruckMsg extends Component {
                 </li>
                 <li>
                     <span>加价幅度<i>{truck.on_sale.increase}元</i></span>
-                    <span>延时周期<i>{truck.on_sale.interval}分钟/1次</i></span>
-                    <span>拍卖佣金<i>{truck.on_sale.commission}元</i></span>
                 </li>
             </ul>
             <div className="bidden ABlock">
@@ -280,8 +281,8 @@ export default class TruckMsg extends Component {
                         <i>7</i>
                     </li>
                 </ul>
-                <a href="#protocol/msg" className="deposit">保证金规则<em>未拍到全额退款</em></a>
-                <a href="#about" className="regular">交易规则</a>
+                <a href="#about" className="deposit">保证金规则<em>未拍到全额退款</em></a>
+                <a href="#protocol/msg" className="regular">服务协议</a>
             </div>
 
 
@@ -292,18 +293,14 @@ export default class TruckMsg extends Component {
                 <h3>车辆配置</h3>
                 <ul className="configure-list">
                     <li>
-                        <span>品牌<i>{config_base[0]? config_base[0] : '--'}</i></span>
-                        <span>VIN码<i>{config_base[7]? config_base[7] : '--'}</i></span>
+                        <span>变速箱<i>{config_base[3]? config_base[3] : '--'}</i></span>
+                        <span>驱动形式<i>{config_base[1]? config_base[1] : '--'}</i></span>
+                        <span>马力<i>{config_base[2]? config_base[2] : '--'}</i></span>
                     </li>
                     <li>
-                        <span>车型<i>{config_base[1]? config_base[1] : '--'}</i></span>
-                        <span>驱动形式<i>{config_base[2]? config_base[2] : '--'}</i></span>
-                        <span>马力<i>{config_base[3]? config_base[3] : '--'}</i></span>
-                    </li>
-                    <li>
-                        <span>变速箱<i>{config_base[4]? config_base[4] : '--'}</i></span>
-                        <span>档位数<i>{config_base[5] ? config_base[5] : '--'}</i></span>
-                        <span>速比<i>{config_base[6]? config_base[6] : '--'}</i></span>
+                        <span>档位数<i>{config_base[4] ? config_base[4] : '--'}</i></span>
+                        <span>速比<i>{config_base[5]? config_base[5] : '--'}</i></span>
+                        <span>VIN码<i>{config_base[0]? config_base[0] : '--'}</i></span>
                     </li>
                 </ul>
             </div>
@@ -335,9 +332,14 @@ export default class TruckMsg extends Component {
                         <span className={db.star>='1'?'good':'good current'}></span>
                         <figure><img src={db.avatar} alt="" /></figure>
                         <h4 className="caption">{db.author}</h4>
-                        <em className="date">{dataTimeFormatter(db.dateline>0?db.dateline *1000:0,6)}</em>
+                        <em className="date">{db.dateline}</em>
                     </div>
-                    <div className="comments-msg">{db.message}</div>
+                    <div className="comments-msg">
+                        {db.message} <br />
+                        { db['images'].map( item =>
+                        <img className="comm-img" src={`http://imgb.360che.com${item}`} alt="" />
+                         )}
+                    </div>
                 </Link>
                 )}
                 <a href={`#review/${roomId}/${truId}`} className="know" onClick={this.goToCom} style={{marginTop: COMM.length == '0' ? '15px' : '0'}}>我看过车，我来点评</a>

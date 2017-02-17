@@ -28,22 +28,19 @@ export default class TruckList extends Component {
     .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        let DATA = res.data
-        if (res.status === 1) { 
-            alert(res.data.error_msg)
-            let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-            return
+        if(XHR.isAlert(res)) {
+            let DATA = res.data
+            
+            // DATA.map((az, inx) => {
+            //     if(az.is_show === 0){
+            //         DATA.splice(inx,1)
+            //     }
+            // })
+            this.setState({
+                isData: true,
+                DB: DATA
+            })
         }
-        // DATA.map((az, inx) => {
-        //     if(az.is_show === 0){
-        //         DATA.splice(inx,1)
-        //     }
-        // })
-        this.setState({
-            isData: true,
-            DB: DATA
-        })
     })
   }
 

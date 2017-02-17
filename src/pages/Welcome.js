@@ -51,23 +51,27 @@ export default class Welcomes extends Component {
         if (!db) return
         let res = JSON.parse(db)
         // if(db.state)
-        Tool.localItem('USERINFO', JSON.stringify(res.data))
+        if(XHR.isAlert(res)) {
+          Tool.localItem('USERINFO', JSON.stringify(res.data))
+        }
       })
 
     XHR.getToday(1)
       .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        nowPage++
-        if(res.data.length === 0){
-          this.setState({isData: true})
-        }else{
-          this.setState({
-            DATA: res.data,
-            nowPage: nowPage,
-            iaLod: res.data.length < 10 ? false : true,
-            isLoading: res.data.length < 10 ? false : true
-          })
+        if(XHR.isAlert(res)) {
+          nowPage++
+          if(res.data.length === 0){
+            this.setState({isData: true})
+          }else{
+            this.setState({
+              DATA: res.data,
+              nowPage: nowPage,
+              iaLod: res.data.length < 10 ? false : true,
+              isLoading: res.data.length < 10 ? false : true
+            })
+          }
         }
       })
   }
@@ -80,19 +84,21 @@ export default class Welcomes extends Component {
       .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        nowPage++
-        DATA.push(...res.data)
-        if(res.data.length < 10) {
-          this.setState({
-            DATA: DATA,
-            isLoading: false
-          })
-        }else{
-          this.setState({
-            DATA: DATA,
-            nowPage: nowPage,
-            iaLod: true
-          })
+        if(XHR.isAlert(res)) {
+          nowPage++
+          DATA.push(...res.data)
+          if(res.data.length < 10) {
+            this.setState({
+              DATA: DATA,
+              isLoading: false
+            })
+          }else{
+            this.setState({
+              DATA: DATA,
+              nowPage: nowPage,
+              iaLod: true
+            })
+          }
         }
       })
     }

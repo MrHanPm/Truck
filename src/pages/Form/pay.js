@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import handleChange from '../../utils/handleChange'
 import { Alert, Tool, AllMsgToast } from '../../utils/tool'
 // import { Link } from 'react-router'
-import Navbar from '../Navbar/pay'
+// import Navbar from '../Navbar/pay'
 import XHR from '../../services/service'
 
 export default class TruckList extends Component {
@@ -20,8 +20,8 @@ export default class TruckList extends Component {
 
         pay: '',
         truName:'',
-        protocol: 0,
-        about: 0
+        protocol: 1,
+        about: 1
     }
     this.handleChange = handleChange.bind(this)
     this.goAddress = this.goAddress.bind(this)
@@ -41,8 +41,8 @@ export default class TruckList extends Component {
         truName: CITYID ? CITYID.name : '',
         'salesroom_id':roomId,
         'truck_id':truId,
-        'city_id': CITYID ? CITYID.val : '',
-        protocol: yn ? 1 : 0,
+        'city_id': CITYID ? CITYID.val : 0,
+        protocol: yn || this.state.protocol === 1 ? 1 : 0,
         mobile: USERINFO.mobile
     })
   }
@@ -93,13 +93,9 @@ export default class TruckList extends Component {
             if (!db) return
             let res = JSON.parse(db)
             let WXCFG = JSON.parse(localStorage.getItem('WXCFG'))
-            if (res.status === 1) {
-                alert(res.data.error_msg)
-                let url = window.location.href
-        window.location.href = `http://2b.360che.com/m/logging.php?action=login&referer=${url}`
-                return
+            if(XHR.isAlert(res)) {
+                XHR.goPay(res.data)
             }
-            XHR.goPay(res.data)
             // XHR.goPay(res.data, WXCFG.timestamp).then((db) => {
             //     if (!db) return
             //     let res = JSON.parse(db)
@@ -186,14 +182,14 @@ export default class TruckList extends Component {
             <div className="agree">
                 <div className="agreement-module">
                     <label className="input-ok-ico" For="proc">
-                    <input type="checkbox" name="protocol" className="inputs" checked={protocol ? 'checked' : '' } onChange={this.CheckForm} id="proc" />
+                    <input type="checkbox" name="protocol" className="inputs" defaultChecked="true" onChange={this.CheckForm} id="proc" />
                     <i className="icon-check"></i>
                     </ label>
                     <span className="agreement">同意<a href="javascript:;" onClick={this.SaveData}>《用户竞拍服务协议》</a></span>
                 </div>
                 <div className="agree-module">
                     <label className="input-ok-ico" For="abt">
-                    <input type="checkbox" name="about" checked={about ? 'checked' : '' } onChange={this.CheckForm} id="abt" className="inputs" />
+                    <input type="checkbox" name="about" onChange={this.CheckForm} id="abt" defaultChecked="true" className="inputs" />
                      <i className="icon-check"></i>
                     </ label>
                     <span className="agree-rule">同意<a href="#about">《保证金规则》</a></span>
@@ -204,9 +200,10 @@ export default class TruckList extends Component {
                 <a href="tel:400-0000-0000" className="phone">400-0000-0000</a>
             </div>
         </div>
-        <Navbar style={{top: '-60px'}}
-                createPay={this.createPay}
-                pay={this.state.pay}/>
+        <div className="auction sure-btn" style={{top: '-60px'}}>
+            <span className="baozi">保证金: <var>{this.state.pay}元</var></span>
+            <em className="pay" onClick={this.createPay}>支付保证金</em>
+        </div>
     </div>
     )
   }

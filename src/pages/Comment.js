@@ -39,20 +39,22 @@ export default class TruckList extends Component {
     .then((db) => {
         if (!db) return
         let res = JSON.parse(db)
-        if(res.data.posts.length === 0){
-            this.setState({
-                isData: true,
-                TruckName: Names
-            })
-        } else {
-            this.setState({
-                TruckName: Names,
-                COMM: res.data.posts,
-                MDB: res.data.tags,
-                nowPage: 2,
-                iaLod: res.data.posts.length < 10 ? false : true,
-                isLoading: res.data.posts.length < 10 ? false : true
-            })
+        if(XHR.isAlert(res)) {
+            if(res.data.posts.length === 0){
+                this.setState({
+                    isData: true,
+                    TruckName: Names
+                })
+            } else {
+                this.setState({
+                    TruckName: Names,
+                    COMM: res.data.posts,
+                    MDB: res.data.tags,
+                    nowPage: 2,
+                    iaLod: res.data.posts.length < 10 ? false : true,
+                    isLoading: res.data.posts.length < 10 ? false : true
+                })
+            }
         }
     })
   }
@@ -80,17 +82,19 @@ export default class TruckList extends Component {
         let res = JSON.parse(db)
         nowPage++
         COMM.push(...res.data.posts)
-        if(res.data.posts.length < 20) {
-          this.setState({
-            COMM: COMM,
-            isLoading: false
-          })
-        }else{
-          this.setState({
-            COMM: COMM,
-            nowPage: nowPage,
-            iaLod: true
-          })
+        if(XHR.isAlert(res)) {
+            if(res.data.posts.length < 20) {
+              this.setState({
+                COMM: COMM,
+                isLoading: false
+              })
+            } else {
+              this.setState({
+                COMM: COMM,
+                nowPage: nowPage,
+                iaLod: true
+              })
+            }
         }
       })
     }
@@ -133,6 +137,9 @@ export default class TruckList extends Component {
                     <div className="content">
                         <p>{db.message}</p>
                     </div>
+                    { db.images.map( item =>
+                    <img className="comm-img" src={`http://imgb.360che.com${item}`} alt="" />
+                     )}
                     <footer>
                         <span className="time">{db.dateline}</span>
                         <i className="reply" data-pid={db.pid} onClick={this.goComm}>回复</i>

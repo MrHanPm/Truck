@@ -1,5 +1,6 @@
 import xhr from './xhr/'
 import API from './api'
+import { HURL } from './xhr/config'
 
 class XHR {
 
@@ -233,8 +234,32 @@ class XHR {
               body: {url: url}
           })
   }
+
+
+
+
+
+  isAlert (res) {
+    if (res.status === 1) {
+        if( typeof(res.data) == 'string' ) {
+          alert(res.data)
+        } else {
+          let url = window.location.href
+          alert(res.data.error_msg)
+          window.location.href = `${HURL}/m/logging.php?action=login&referer=${url}`
+        }
+        return false
+    } else {
+      return true
+    }
+  }
   
 }
 
 // 实例化后再导出
 export default new XHR()
+
+
+
+
+
